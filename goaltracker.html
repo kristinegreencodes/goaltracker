@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Daily & Weekly Goals</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons (checkbox, trash, sun, moon, cog, times, edit, save, chevron-down, chevron-up) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align items to the start of the cross axis */
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease;
+        }
+        .main-container {
+            display: flex;
+            flex-direction: column; /* Stack columns on small screens */
+            gap: 24px;
+            width: 100%;
+            max-width: 1200px;
+        }
+        @media (min-width: 768px) { /* Medium screens and up */
+            .main-container {
+                flex-direction: row; /* Side-by-side on larger screens */
+            }
+        }
+        .left-panel, .goal-tracker-box, .reminder-box, .calendar-clock-box {
+            background-color: #ffffff;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .left-panel {
+            flex: 1;
+        }
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        input[type="text"] {
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease, color 0.3s ease;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #6366f1; /* Indigo-500 */
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3); /* Indigo-500 with opacity */
+        }
+        button {
+            background-color: #6366f1; /* Indigo-500 */
+            color: #ffffff;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, color 0.3s ease;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #4f46e5; /* Indigo-600 */
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .todo-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+            transition: border-color 0.3s ease;
+        }
+        .todo-item:last-child {
+            border-bottom: none;
+        }
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+        .todo-item input[type="checkbox"] {
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+            accent-color: #6366f1;
+            cursor: pointer;
+        }
+        .todo-item .todo-text {
+            flex-grow: 1;
+            text-align: left;
+            font-size: 16px;
+            color: #374151;
+            word-break: break-word; /* Ensure long text wraps */
+            transition: color 0.3s ease;
+        }
+        .todo-item .action-buttons {
+            display: flex;
+            gap: 8px; /* Space between edit and delete buttons */
+        }
+        .todo-item .edit-btn,
+        .todo-item .delete-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0 4px; /* Adjust padding for spacing */
+            transition: color 0.2s ease-in-out;
+        }
+        .todo-item .edit-btn {
+            color: #22c55e; /* Green-500 */
+        }
+        .todo-item .edit-btn:hover {
+            color: #16a34a; /* Green-600 */
+        }
+        .todo-item .delete-btn {
+            color: #ef4444; /* Red-500 */
+        }
+        .todo-item .delete-btn:hover {
+            color: #dc2626; /* Red-600 */
+        }
+        .goal-circles {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 24px;
+        }
+        .goal-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #e0e7ff; /* Indigo-100 */
+            border: 2px solid #a5b4fc; /* Indigo-300 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #6366f1; /* Indigo-500 */
+            transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, color 0.3s ease;
+        }
+        .goal-circle.completed {
+            background-color: #34d399; /* Green-400 */
+            border-color: #10b981; /* Green-500 */
+            color: #ffffff;
+        }
+        .message-box {
+            background-color: #e0e7ff; /* Indigo-100 */
+            color: #4338ca; /* Indigo-700 */
+            border: 1px solid #a5b4fc; /* Indigo-300 */
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 24px;
+            text-align: left;
+            font-size: 15px;
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #6366f1;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Calendar and Clock Styles */
+        .calendar-clock-box {
+            padding: 24px; /* Slightly less padding than other boxes */
+            text-align: center;
+        }
+        .calendar-display {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 16px;
+            transition: color 0.3s ease;
+        }
+        .clock-display {
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: 700; /* font-bold */
+            color: #4f46e5; /* Indigo-600 */
+            margin-bottom: 8px;
+            transition: color 0.3s ease;
+        }
+        .clock-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 16px;
+            transition: color 0.3s ease;
+        }
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .single-clock {
+            padding: 12px 0;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .single-clock:first-child {
+            border-top: none;
+        }
+
+
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background-color: #1a202c; /* Darker background */
+            color: #e2e8f0; /* Light text */
+        }
+        body.dark-mode .left-panel,
+        body.dark-mode .goal-tracker-box,
+        body.dark-mode .reminder-box,
+        body.dark-mode .calendar-clock-box {
+            background-color: #2d3748; /* Darker panel background */
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+        }
+        body.dark-mode h2,
+        body.dark-mode .text-gray-800,
+        body.dark-mode .calendar-display {
+            color: #e2e8f0; /* Light text for headers */
+        }
+        body.dark-mode .text-gray-600,
+        body.dark-mode .clock-label {
+            color: #cbd5e0; /* Lighter gray text */
+        }
+        body.dark-mode input[type="text"] {
+            background-color: #4a5568; /* Darker input background */
+            border-color: #6366f1; /* Keep border color consistent for focus */
+            color: #e2e8f0; /* Light text in input */
+        }
+        body.dark-mode input[type="text"]::placeholder {
+            color: #a0aec0; /* Lighter placeholder text */
+        }
+        body.dark-mode .todo-item {
+            border-color: #4a5568; /* Darker border for todo items */
+        }
+        body.dark-mode .todo-item .todo-text {
+            color: #e2e8f0; /* Light text for todo items */
+        }
+        body.dark-mode .todo-item.completed .todo-text {
+            color: #718096; /* Darker strikethrough text */
+        }
+        body.dark-mode .no-todos-message,
+        body.dark-mode .no-daily-todos-message {
+            color: #a0aec0; /* Lighter gray for messages */
+        }
+        body.dark-mode .goal-circle {
+            background-color: #4a5568; /* Darker circle background */
+            border-color: #6366f1; /* Keep border color consistent */
+            color: #e2e8f0; /* Light text in circles */
+        }
+        body.dark-mode .goal-circle.completed {
+            background-color: #10b981; /* Green-500 for completed */
+            border-color: #059669; /* Darker green border */
+            color: #ffffff;
+        }
+        body.dark-mode .goal-status,
+        body.dark-mode .days-left {
+            color: #a78bfa; /* Lighter indigo for status */
+        }
+        body.dark-mode .message-box {
+            background-color: #4a5568; /* Darker message box */
+            color: #e2e8f0; /* Light text */
+            border-color: #6366f1; /* Indigo-500 */
+        }
+        body.dark-mode .message-box .text-red-700 {
+            color: #fca5a5; /* Lighter red for errors */
+        }
+        body.dark-mode .clock-display {
+            color: #a78bfa; /* Lighter indigo for clocks */
+        }
+        body.dark-mode .single-clock {
+            border-top-color: #4a5568; /* Darker border for clocks */
+        }
+
+        /* Floating Widget Container */
+        .floating-widget-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 999; /* Below settings button */
+            width: 90%; /* Responsive width */
+            max-width: 350px; /* Max width for larger screens */
+            transition: transform 0.3s ease-out; /* Smooth transition for collapsing */
+        }
+
+        /* Collapsed state for the container */
+        .floating-widget-container.collapsed {
+            transform: translateY(calc(100% - 60px)); /* Move up to hide content, leave button visible */
+            /* Height of the toggle button + some margin */
+        }
+
+        .floating-widget-item {
+            background-color: #ffffff;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+        }
+        body.dark-mode .floating-widget-item {
+            background-color: #2d3748;
+            box-shadow: 0 44px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Hide content when container is collapsed */
+        .floating-widget-container.collapsed .floating-widget-item {
+            opacity: 0;
+            transform: translateY(20px); /* Move slightly down while fading out */
+            pointer-events: none; /* Disable interactions */
+            height: 0; /* Collapse height */
+            padding: 0; /* Remove padding */
+            margin: 0; /* Remove margin */
+            overflow: hidden; /* Hide overflow content */
+        }
+
+
+        .youtube-player-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+        .youtube-player-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        /* Settings Button */
+        .settings-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #6366f1;
+            color: #ffffff;
+            border: none;
+            font-size: 24px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, box-shadow 0.2s ease;
+            z-index: 1001; /* Ensured to be above modal overlay (1000) when modal is closed */
+        }
+        .settings-button:hover {
+            background-color: #4f46e5;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        .settings-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        body.dark-mode .settings-button {
+            background-color: #4a5568;
+            color: #e2e8f0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+        body.dark-mode .settings-button:hover {
+            background-color: #6366f1;
+        }
+
+        /* Toggle Button for Floating Widgets */
+        .toggle-widgets-button {
+            background-color: #6366f1; /* Indigo-500 */
+            color: #ffffff;
+            border: none;
+            font-size: 20px; /* Slightly smaller than settings button */
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, box-shadow 0.2s ease;
+            align-self: flex-end; /* Align to the right within the flex container */
+            margin-bottom: 16px; /* Space between button and widgets */
+        }
+        .toggle-widgets-button:hover {
+            background-color: #4f46e5;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        .toggle-widgets-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        body.dark-mode .toggle-widgets-button {
+            background-color: #4a5568;
+            color: #e2e8f0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+        body.dark-mode .toggle-widgets-button:hover {
+            background-color: #6366f1;
+        }
+        /* Adjust position for the button within the container */
+        .floating-widget-container.collapsed .toggle-widgets-button {
+            margin-bottom: 0; /* No margin when collapsed, as it's the only visible element */
+        }
+
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: #ffffff;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.15);
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .modal-close-button {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #9ca3af;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .modal-close-button:hover {
+            color: #6b7280;
+        }
+        body.dark-mode .modal-content {
+            background-color: #2d3748;
+            color: #e2e8f0;
+        }
+        body.dark-mode .modal-close-button {
+            color: #a0aec0;
+        }
+        body.dark-mode .modal-close-button:hover {
+            color: #cbd5e0;
+        }
+        .modal-content h3 {
+            color: #374151; /* Default light mode color */
+            transition: color 0.3s ease;
+        }
+        body.dark-mode .modal-content h3 {
+            color: #e2e8f0; /* Dark mode color */
+        }
+        .theme-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        body.dark-mode .theme-option {
+            border-color: #4a5568;
+            background-color: #4a5568;
+        }
+        .theme-option label {
+            font-size: 16px;
+            font-weight: 500;
+            color: #374151;
+            transition: color 0.3s ease;
+        }
+        body.dark-mode .theme-option label {
+            color: #e2e8f0;
+        }
+        .theme-option input[type="radio"] {
+            margin-left: 12px;
+            accent-color: #6366f1;
+            width: 18px;
+            height: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Left Panel: To-Do List -->
+        <div class="left-panel">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">General To-Do List</h2>
+            </div>
+            <div class="flex gap-4 mb-6 flex-col sm:flex-row">
+                <input type="text" id="todoInput" placeholder="Add a new general task..." class="flex-grow">
+                <button id="addTodoButton" class="sm:w-auto mt-4 sm:mt-0">Add Task</button>
+            </div>
+            <div id="loadingTodos" class="loading-spinner hidden"></div>
+            <ul id="todoList" class="divide-y divide-gray-200">
+                <!-- General To-do items will be dynamically added here -->
+            </ul>
+            <p id="noTodosMessage" class="text-gray-500 text-center mt-4 hidden">No general tasks yet! Add one above.</p>
+
+            <!-- New Daily To-Do List Section -->
+            <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Daily To-Do List <span id="dailyDateDisplay" class="text-lg font-normal text-gray-600"></span></h2>
+                <div class="flex gap-4 mb-6 flex-col sm:flex-row">
+                    <input type="text" id="dailyTodoInput" placeholder="Add a new daily task..." class="flex-grow">
+                    <button id="addDailyTodoButton" class="sm:w-auto mt-4 sm:mt-0">Add Daily Task</button>
+                </div>
+                <div id="loadingDailyTodos" class="loading-spinner hidden"></div>
+                <ul id="dailyTodoList" class="divide-y divide-gray-200">
+                    <!-- Daily To-do items will be dynamically added here -->
+                </ul>
+                <p id="noDailyTodosMessage" class="text-gray-500 text-center mt-4 hidden">No daily tasks yet! Add one above.</p>
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="right-panel">
+            <!-- Calendar and Clocks -->
+            <div class="calendar-clock-box">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Today's Date & Time</h2>
+                <div id="currentDateDisplay" class="calendar-display"></div>
+                <div class="clock-container">
+                    <div class="single-clock">
+                        <div id="centralTime" class="clock-display"></div>
+                        <div class="clock-label">Central Time (CT)</div>
+                    </div>
+                    <div class="single-clock">
+                        <div id="philippinesTime" class="clock-display"></div>
+                        <div class="clock-label">Philippines Time (PHT)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upper Right: Weekly Goal Tracker -->
+            <div class="goal-tracker-box">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Weekly Goal Tracker</h2>
+                <p class="text-gray-600 text-center mb-4">Complete 3 tasks this week to meet your goal!</p>
+                <div class="goal-circles">
+                    <div id="goalCircle1" class="goal-circle">1</div>
+                    <div id="goalCircle2" class="goal-circle">2</div>
+                    <div id="goalCircle3" class="goal-circle">3</div>
+                </div>
+                <p id="goalStatus" class="text-center text-lg font-semibold mt-6 text-indigo-700">Progress: 0/3</p>
+                <p id="goalMetMessage" class="text-center text-green-600 font-bold text-xl mt-4 hidden">Goal Achieved this Week! 🎉</p>
+            </div>
+
+            <!-- Bottom Right: Monthly Reminder -->
+            <div class="reminder-box">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Monthly Reminder</h2>
+                <p id="daysLeft" class="text-center text-3xl font-bold text-indigo-700">-- Days Left</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Player Section -->
+    <div id="floatingWidgetContainer" class="floating-widget-container">
+        <!-- Toggle button for the widgets -->
+        <button id="toggleWidgetsButton" class="toggle-widgets-button">
+            <i class="fas fa-chevron-down"></i>
+        </button>
+
+        <div class="floating-widget-item">
+            <h3 class="text-lg font-bold text-gray-800 mb-3">Music Player</h3>
+            <p class="text-sm text-gray-600 mb-2">
+                Enter YouTube Video Link 
+               
+            </p>
+            <div class="flex gap-2 mb-3">
+                <input type="text" id="youtubeVideoLinkInput" placeholder="Enter video link..." class="flex-grow text-sm">
+                <button id="loadYoutubeVideoButton" class="w-auto px-4 py-2 text-sm">Load</button>
+            </div>
+            <div class="youtube-player-container">
+                <!-- Default YouTube Embed: Lo-fi Hip Hop Radio - Beats to Relax/Study To -->
+                <iframe id="youtubePlayer" src="https://www.youtube.com/embed/jfKfPfyJRdk?si=h5g-r998jU-6_j1b"
+                        title="YouTube video player" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+        </div>
+        <!-- Removed News Section -->
+    </div>
+
+    <!-- Settings Button (moved outside main-container for fixed positioning) -->
+    <button id="settingsButton" class="settings-button">
+        <i class="fas fa-cog"></i>
+    </button>
+
+    <!-- Settings Modal -->
+    <div id="settingsModalOverlay" class="modal-overlay">
+        <div class="modal-content">
+            <button id="closeSettingsModal" class="modal-close-button">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3 class="text-xl font-bold text-gray-800 mb-6">Settings</h3>
+
+            <div class="mb-4">
+                <h4 class="text-lg font-semibold text-gray-700 mb-4">Theme</h4>
+                <div class="theme-option">
+                    <label for="darkModeRadio" class="cursor-pointer">
+                        <i class="fas fa-moon mr-2"></i> Dark Mode
+                    </label>
+                    <input type="radio" id="darkModeRadio" name="theme" value="dark">
+                </div>
+                <div class="theme-option">
+                    <label for="lightModeRadio" class="cursor-pointer">
+                        <i class="fas fa-sun mr-2"></i> Light Mode
+                    </label>
+                    <input type="radio" id="lightModeRadio" name="theme" value="light">
+                </div>
+            </div>
+            <!-- Add more settings options here if needed in the future -->
+        </div>
+    </div>
+
+    <script type="module">
+        // Get references to HTML elements
+        const todoInput = document.getElementById('todoInput');
+        const addTodoButton = document.getElementById('addTodoButton');
+        const todoList = document.getElementById('todoList');
+        const noTodosMessage = document.getElementById('noTodosMessage');
+        const loadingTodos = document.getElementById('loadingTodos');
+
+        const dailyTodoInput = document.getElementById('dailyTodoInput');
+        const addDailyTodoButton = document.getElementById('addDailyTodoButton');
+        const dailyTodoList = document.getElementById('dailyTodoList');
+        const noDailyTodosMessage = document.getElementById('noDailyTodosMessage');
+        const loadingDailyTodos = document.getElementById('loadingDailyTodos');
+        const dailyDateDisplay = document.getElementById('dailyDateDisplay');
+
+        const goalCircle1 = document.getElementById('goalCircle1');
+        const goalCircle2 = document.getElementById('goalCircle2');
+        const goalCircle3 = document.getElementById('goalCircle3');
+        const goalStatus = document.getElementById('goalStatus');
+        const goalMetMessage = document.getElementById('goalMetMessage');
+
+        const daysLeftElement = document.getElementById('daysLeft');
+
+        // Calendar and Clock elements
+        const currentDateDisplay = document.getElementById('currentDateDisplay');
+        const centralTimeDisplay = document.getElementById('centralTime');
+        const philippinesTimeDisplay = document.getElementById('philippinesTime');
+
+        // Settings Modal elements
+        const settingsButton = document.getElementById('settingsButton');
+        const settingsModalOverlay = document.getElementById('settingsModalOverlay');
+        const closeSettingsModal = document.getElementById('closeSettingsModal');
+        const darkModeRadio = document.getElementById('darkModeRadio');
+        const lightModeRadio = document.getElementById('lightModeRadio');
+        const body = document.body;
+
+        // Floating Widgets elements
+        const floatingWidgetContainer = document.getElementById('floatingWidgetContainer');
+        const toggleWidgetsButton = document.getElementById('toggleWidgetsButton');
+        // YouTube Player elements
+        const youtubeVideoLinkInput = document.getElementById('youtubeVideoLinkInput'); // Changed to Link Input
+        const loadYoutubeVideoButton = document.getElementById('loadYoutubeVideoButton');
+        const youtubePlayer = document.getElementById('youtubePlayer');
+
+
+        // --- Theme Management Functions ---
+        const THEME_STORAGE_KEY = 'themePreference';
+
+        /**
+         * Enables dark mode by adding the 'dark-mode' class to the body.
+         * Sets the dark mode radio button to checked.
+         */
+        function enableDarkMode() {
+            body.classList.add('dark-mode');
+            localStorage.setItem(THEME_STORAGE_KEY, 'dark');
+            if (darkModeRadio) darkModeRadio.checked = true;
+        }
+
+        /**
+         * Disables dark mode by removing the 'dark-mode' class from the body.
+         * Sets the light mode radio button to checked.
+         */
+        function disableDarkMode() {
+            body.classList.remove('dark-mode');
+            localStorage.setItem(THEME_STORAGE_KEY, 'light');
+            if (lightModeRadio) lightModeRadio.checked = true;
+        }
+
+        /**
+         * Loads the theme preference from local storage or sets dark mode as default.
+         */
+        function loadThemePreference() {
+            const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+            if (savedTheme === 'light') {
+                disableDarkMode();
+            } else { // Default to dark mode if no preference or 'dark'
+                enableDarkMode();
+            }
+        }
+
+        // Event listeners for theme radio buttons
+        if (darkModeRadio) {
+            darkModeRadio.addEventListener('change', () => {
+                if (darkModeRadio.checked) {
+                    enableDarkMode();
+                }
+            });
+        }
+        if (lightModeRadio) {
+            lightModeRadio.addEventListener('change', () => {
+                if (lightModeRadio.checked) {
+                    disableDarkMode();
+                }
+            });
+        }
+
+        // --- Settings Modal Functions ---
+        settingsButton.addEventListener('click', () => {
+            console.log('Settings button clicked!'); // Debugging log
+            settingsModalOverlay.classList.add('active');
+            // Ensure radio buttons reflect current theme when modal opens
+            loadThemePreference();
+        });
+
+        closeSettingsModal.addEventListener('click', () => {
+            settingsModalOverlay.classList.remove('active');
+        });
+
+        // Close modal when clicking outside of it
+        settingsModalOverlay.addEventListener('click', (e) => {
+            if (e.target === settingsModalOverlay) {
+                settingsModalOverlay.classList.remove('active');
+            }
+        });
+
+        // --- General To-Do List Functions ---
+
+        /**
+         * Loads general to-do items from local storage.
+         * @returns {Array} An array of to-do items.
+         */
+        function loadGeneralTodos() {
+            const todosJson = localStorage.getItem('generalTodos');
+            return todosJson ? JSON.parse(todosJson) : [];
+        }
+
+        /**
+         * Saves general to-do items to local storage.
+         * @param {Array} todos - The array of to-do items to save.
+         */
+        function saveGeneralTodos(todos) {
+            localStorage.setItem('generalTodos', JSON.stringify(todos));
+            renderGeneralTodos(); // Re-render after saving
+        }
+
+        /**
+         * Renders all general to-do items in the UI.
+         */
+        function renderGeneralTodos() {
+            const todos = loadGeneralTodos();
+            todoList.innerHTML = ''; // Clear current list
+            loadingTodos.classList.add('hidden'); // Hide loading spinner
+
+            if (todos.length === 0) {
+                noTodosMessage.classList.remove('hidden');
+            } else {
+                noTodosMessage.classList.add('hidden');
+                // Sort by timestamp (latest first) before rendering
+                todos.sort((a, b) => b.timestamp - a.timestamp);
+                todos.forEach(todo => {
+                    renderTodoItem(todo.id, todo.text, todo.completed, todoList, updateGeneralTodoStatus, deleteGeneralTodoItem, updateGeneralTodoText);
+                });
+            }
+        }
+
+        /**
+         * Adds a new general to-do item to local storage.
+         * @param {string} text - The text content of the new to-do item.
+         */
+        function addGeneralTodo(text) {
+            const todos = loadGeneralTodos();
+            const newTodo = {
+                id: Date.now().toString(), // Unique ID for the todo
+                text: text,
+                completed: false,
+                timestamp: Date.now()
+            };
+            todos.push(newTodo);
+            saveGeneralTodos(todos);
+            todoInput.value = ''; // Clear input field
+        }
+
+        /**
+         * Updates the completion status of a general to-do item in local storage.
+         * @param {string} id - The ID of the to-do item.
+         * @param {boolean} completed - The new completion status.
+         */
+        function updateGeneralTodoStatus(id, completed) {
+            const todos = loadGeneralTodos();
+            const todoIndex = todos.findIndex(todo => todo.id === id);
+            if (todoIndex > -1) {
+                todos[todoIndex].completed = completed;
+                saveGeneralTodos(todos);
+                // If completed, increment weekly goal and remove after delay
+                if (completed) {
+                    incrementWeeklyGoal();
+                    setTimeout(() => {
+                        deleteGeneralTodoItem(id);
+                    }, 500);
+                }
+            }
+        }
+
+        /**
+         * Updates the text of a general to-do item in local storage.
+         * @param {string} id - The ID of the to-do item.
+         * @param {string} newText - The new text content.
+         */
+        function updateGeneralTodoText(id, newText) {
+            const todos = loadGeneralTodos();
+            const todoIndex = todos.findIndex(todo => todo.id === id);
+            if (todoIndex > -1) {
+                todos[todoIndex].text = newText;
+                saveGeneralTodos(todos);
+            }
+        }
+
+        /**
+         * Deletes a general to-do item from local storage.
+         * @param {string} id - The ID of the to-do item.
+         */
+        function deleteGeneralTodoItem(id) {
+            let todos = loadGeneralTodos();
+            todos = todos.filter(todo => todo.id !== id);
+            saveGeneralTodos(todos);
+        }
+
+        // Event listener for adding a new general to-do
+        addTodoButton.addEventListener('click', () => {
+            const text = todoInput.value.trim();
+            if (text) {
+                addGeneralTodo(text);
+            } else {
+                const errorMessageDiv = document.createElement('div');
+                errorMessageDiv.className = 'message-box bg-red-100 text-red-700 border-red-300 mt-4';
+                errorMessageDiv.textContent = `Please enter a general task!`;
+                todoInput.after(errorMessageDiv); // Place error message after input
+                setTimeout(() => errorMessageDiv.remove(), 3000); // Remove after 3 seconds
+            }
+        });
+
+        todoInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addTodoButton.click();
+            }
+        });
+
+        // --- Daily To-Do List Functions ---
+
+        /**
+         * Gets the local storage key for today's daily todos.
+         * @returns {string} - The key based on the current date (dailyTodos_YYYY-MM-DD).
+         */
+        function getDailyTodoStorageKey() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+            const day = String(today.getDate()).padStart(2, '0');
+            return `dailyTodos_${year}-${month}-${day}`;
+        }
+
+        /**
+         * Loads daily to-do items from local storage for the current day.
+         * Resets the list if it's a new day.
+         * @returns {Array} An array of daily to-do items.
+         */
+        function loadDailyTodos() {
+            const todayKey = getDailyTodoStorageKey();
+            const lastLoadedDate = localStorage.getItem('lastDailyTodoDate');
+
+            // If it's a new day, clear previous daily todos
+            if (lastLoadedDate !== todayKey) {
+                localStorage.removeItem(lastLoadedDate); // Clear old day's data
+                localStorage.setItem('lastDailyTodoDate', todayKey); // Update last loaded date
+                return []; // Start with an empty list for the new day
+            }
+
+            const todosJson = localStorage.getItem(todayKey);
+            return todosJson ? JSON.parse(todosJson) : [];
+        }
+
+        /**
+         * Saves daily to-do items to local storage for the current day.
+         * @param {Array} todos - The array of daily to-do items to save.
+         */
+        function saveDailyTodos(todos) {
+            const todayKey = getDailyTodoStorageKey();
+            localStorage.setItem(todayKey, JSON.stringify(todos));
+            localStorage.setItem('lastDailyTodoDate', todayKey); // Keep track of the date saved
+            renderDailyTodos(); // Re-render after saving
+        }
+
+        /**
+         * Renders all daily to-do items in the UI.
+         */
+        function renderDailyTodos() {
+            const dailyTodos = loadDailyTodos();
+            dailyTodoList.innerHTML = ''; // Clear current daily list
+            loadingDailyTodos.classList.add('hidden'); // Hide loading spinner
+
+            const today = new Date();
+            const monthName = today.toLocaleString('default', { month: 'long' });
+            const dayOfMonth = today.getDate();
+            const year = today.getFullYear();
+            dailyDateDisplay.textContent = `(${monthName} ${dayOfMonth}, ${year})`; // Display current date in text format
+
+            if (dailyTodos.length === 0) {
+                noDailyTodosMessage.classList.remove('hidden');
+            } else {
+                noDailyTodosMessage.classList.add('hidden');
+                // Sort by timestamp (latest first) before rendering
+                dailyTodos.sort((a, b) => b.timestamp - a.timestamp);
+                dailyTodos.forEach(todo => {
+                    renderTodoItem(todo.id, todo.text, todo.completed, dailyTodoList, updateDailyTodoStatus, deleteDailyTodoItem, updateDailyTodoText);
+                });
+            }
+        }
+
+        /**
+         * Adds a new daily to-do item to local storage.
+         * @param {string} text - The text content of the new daily to-do item.
+         */
+        function addDailyTodo(text) {
+            const dailyTodos = loadDailyTodos();
+            const newTodo = {
+                id: Date.now().toString(),
+                text: text,
+                completed: false,
+                timestamp: Date.now()
+            };
+            dailyTodos.push(newTodo);
+            saveDailyTodos(dailyTodos);
+            dailyTodoInput.value = ''; // Clear input field
+        }
+
+        /**
+         * Updates the completion status of a daily to-do item in local storage.
+         * @param {string} id - The ID of the daily to-do item.
+         * @param {boolean} completed - The new completion status.
+         */
+        function updateDailyTodoStatus(id, completed) {
+            const dailyTodos = loadDailyTodos();
+            const todoIndex = dailyTodos.findIndex(todo => todo.id === id);
+            if (todoIndex > -1) {
+                dailyTodos[todoIndex].completed = completed;
+                saveDailyTodos(dailyTodos);
+                // For daily tasks, we typically delete them on completion rather than incrementing a goal
+                if (completed) {
+                    setTimeout(() => {
+                        deleteDailyTodoItem(id);
+                    }, 500);
+                }
+            }
+        }
+
+        /**
+         * Updates the text of a daily to-do item in local storage.
+         * @param {string} id - The ID of the daily to-do item.
+         * @param {string} newText - The new text content.
+         */
+        function updateDailyTodoText(id, newText) {
+            const dailyTodos = loadDailyTodos();
+            const todoIndex = dailyTodos.findIndex(todo => todo.id === id);
+            if (todoIndex > -1) {
+                dailyTodos[todoIndex].text = newText;
+                saveDailyTodos(dailyTodos);
+            }
+        }
+
+        /**
+         * Deletes a daily to-do item from local storage.
+         * @param {string} id - The ID of the daily to-do item.
+         */
+        function deleteDailyTodoItem(id) {
+            let dailyTodos = loadDailyTodos();
+            dailyTodos = dailyTodos.filter(todo => todo.id !== id);
+            saveDailyTodos(dailyTodos);
+        }
+
+        // Event listener for adding a new daily to-do
+        addDailyTodoButton.addEventListener('click', () => {
+            const text = dailyTodoInput.value.trim();
+            if (text) {
+                addDailyTodo(text);
+            } else {
+                const errorMessageDiv = document.createElement('div');
+                errorMessageDiv.className = 'message-box bg-red-100 text-red-700 border-red-300 mt-4';
+                errorMessageDiv.textContent = `Please enter a daily task!`;
+                dailyTodoInput.after(errorMessageDiv);
+                setTimeout(() => errorMessageDiv.remove(), 3000);
+            }
+        });
+
+        dailyTodoInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addDailyTodoButton.click();
+            }
+        });
+
+
+        /**
+         * Renders a single to-do item (general or daily) in the UI.
+         * This is a generalized function used by both lists.
+         * @param {string} id - The unique ID for the todo item.
+         * @param {string} text - The text content of the to-do item.
+         * @param {boolean} completed - Whether the to-do item is completed.
+         * @param {HTMLElement} parentListElement - The <ul> element to append to.
+         * @param {Function} updateStatusFunction - The function to call to update status (updateGeneralTodoStatus or updateDailyTodoStatus).
+         * @param {Function} deleteFunction - The function to call to delete item (deleteGeneralTodoItem or deleteDailyTodoItem).
+         * @param {Function} updateTextFunction - The function to call to update text (updateGeneralTodoText or updateDailyTodoText).
+         */
+        function renderTodoItem(id, text, completed, parentListElement, updateStatusFunction, deleteFunction, updateTextFunction) {
+            const listItem = document.createElement('li');
+            listItem.className = `todo-item ${completed ? 'completed' : ''}`;
+            listItem.dataset.id = id;
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = completed;
+            checkbox.className = 'todo-checkbox';
+
+            const textSpan = document.createElement('span');
+            textSpan.className = 'todo-text';
+            textSpan.textContent = text;
+
+            const actionButtonsDiv = document.createElement('div');
+            actionButtonsDiv.className = 'action-buttons';
+
+            const editButton = document.createElement('button');
+            editButton.className = 'edit-btn';
+            editButton.innerHTML = '<i class="fas fa-edit"></i>';
+
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'delete-btn';
+            deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
+
+            actionButtonsDiv.appendChild(editButton);
+            actionButtonsDiv.appendChild(deleteButton);
+
+            listItem.appendChild(checkbox);
+            listItem.appendChild(textSpan);
+            listItem.appendChild(actionButtonsDiv);
+            parentListElement.appendChild(listItem);
+
+            // Event listeners
+            checkbox.addEventListener('change', (e) => {
+                const isChecked = e.target.checked;
+                updateStatusFunction(id, isChecked);
+            });
+
+            deleteButton.addEventListener('click', () => {
+                if (confirm("Are you sure you want to delete this task?")) {
+                    deleteFunction(id);
+                }
+            });
+
+            editButton.addEventListener('click', function editHandler() {
+                // Toggle to edit mode
+                if (textSpan.style.display !== 'none') {
+                    const editInput = document.createElement('input');
+                    editInput.type = 'text';
+                    editInput.className = 'flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500';
+                    editInput.value = textSpan.textContent;
+                    textSpan.style.display = 'none'; // Hide the span
+                    listItem.insertBefore(editInput, actionButtonsDiv); // Insert input before buttons
+                    editInput.focus();
+
+                    // Change edit button to save button
+                    editButton.innerHTML = '<i class="fas fa-save"></i>';
+                    editButton.classList.remove('edit-btn');
+                    editButton.classList.add('save-btn');
+                    editButton.style.color = '#3b82f6'; /* Blue-500 for save */
+
+                    const saveChanges = () => {
+                        const newText = editInput.value.trim();
+                        if (newText && newText !== textSpan.textContent) {
+                            updateTextFunction(id, newText);
+                        }
+                        // Revert to display mode
+                        textSpan.textContent = newText;
+                        textSpan.style.display = 'block'; // Show the span
+                        editInput.remove(); // Remove the input field
+
+                        // Change save button back to edit button
+                        editButton.innerHTML = '<i class="fas fa-edit"></i>';
+                        editButton.classList.remove('save-btn');
+                        editButton.classList.add('edit-btn');
+                        editButton.style.color = '#22c55e'; /* Green-500 for edit */
+
+                        // Re-add the original edit handler
+                        editButton.removeEventListener('click', saveChanges);
+                        editButton.addEventListener('click', editHandler);
+                    };
+
+                    editInput.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            saveChanges();
+                        }
+                    });
+
+                    // Remove current edit handler and add save handler
+                    editButton.removeEventListener('click', editHandler);
+                    editButton.addEventListener('click', saveChanges);
+                }
+            });
+        }
+
+        // --- Weekly Goal Tracker Functions ---
+
+        /**
+         * Gets the local storage key for the current week's goals.
+         * @returns {string} - The key based on the start of the current ISO week (weeklyGoals_YYYY-MM-DD).
+         */
+        function getWeeklyGoalStorageKey() {
+            const d = new Date();
+            const day = d.getDay(); // Sunday - 0, Monday - 1, ..., Saturday - 6
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust for Monday start
+            const startOfWeek = new Date(d.setDate(diff));
+            startOfWeek.setHours(0, 0, 0, 0);
+            startOfWeek.setMilliseconds(0);
+            return `weeklyGoals_${startOfWeek.toISOString().split('T')[0]}`;
+        }
+
+        /**
+         * Loads the weekly goal count from local storage.
+         * Resets the count if it's a new week.
+         * @returns {number} The current completed goal count for the week.
+         */
+        function loadWeeklyGoals() {
+            const weekKey = getWeeklyGoalStorageKey();
+            const lastLoadedWeek = localStorage.getItem('lastWeeklyGoalWeek');
+
+            // If it's a new week, reset the goal count
+            if (lastLoadedWeek !== weekKey) {
+                localStorage.removeItem(lastLoadedWeek); // Clear old week's data
+                localStorage.setItem('lastWeeklyGoalWeek', weekKey); // Update last loaded date
+                return 0; // Start with 0 for the new week
+            }
+
+            const goalsJson = localStorage.getItem(weekKey);
+            return goalsJson ? JSON.parse(goalsJson).count : 0;
+        }
+
+        /**
+         * Saves the weekly goal count to local storage.
+         * @param {number} count - The current completed goal count.
+         */
+        function saveWeeklyGoals(count) {
+            const weekKey = getWeeklyGoalStorageKey();
+            localStorage.setItem(weekKey, JSON.stringify({ count: count }));
+            localStorage.setItem('lastWeeklyGoalWeek', weekKey); // Keep track of the week saved
+            updateGoalTrackerUI(count); // Re-render after saving
+        }
+
+        /**
+         * Increments the weekly goal count in local storage.
+         */
+        function incrementWeeklyGoal() {
+            let currentCount = loadWeeklyGoals();
+            if (currentCount < 3) {
+                currentCount++;
+                saveWeeklyGoals(currentCount);
+            }
+        }
+
+        /**
+         * Updates the UI for the weekly goal tracker.
+         * @param {number} completedCount - The number of goals completed this week.
+         */
+        function updateGoalTrackerUI(completedCount) {
+            goalStatus.textContent = `Progress: ${completedCount}/3`;
+
+            // Update circle colors
+            goalCircle1.classList.toggle('completed', completedCount >= 1);
+            goalCircle2.classList.toggle('completed', completedCount >= 2);
+            goalCircle3.classList.toggle('completed', completedCount >= 3);
+
+            // Show/hide goal met message
+            if (completedCount >= 3) {
+                goalMetMessage.classList.remove('hidden');
+            } else {
+                goalMetMessage.classList.add('hidden');
+            }
+        }
+
+        // --- Monthly Reminder Functions ---
+
+        /**
+         * Calculates and displays the number of days left in the current month.
+         */
+        function calculateDaysLeftInMonth() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const monthName = today.toLocaleString('default', { month: 'long' }); // Get full month name
+
+            // Get the last day of the current month
+            const lastDayOfMonth = new Date(year, today.getMonth() + 1, 0).getDate();
+            const currentDay = today.getDate();
+
+            const daysLeft = lastDayOfMonth - currentDay;
+            daysLeftElement.textContent = `${daysLeft} Days Left in ${monthName}`; // Update text
+        }
+
+        // --- Calendar and Clock Functions ---
+
+        /**
+         * Updates the current date display.
+         */
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            currentDateDisplay.textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        /**
+         * Updates the digital clocks for Central Time and Philippines Time.
+         */
+        function updateClocks() {
+            const now = new Date();
+
+            // Central Time (CT) - Using 'America/Chicago' for CDT/CST
+            const centralTimeOptions = {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true,
+                timeZone: 'America/Chicago'
+            };
+            centralTimeDisplay.textContent = now.toLocaleTimeString('en-US', centralTimeOptions);
+
+            // Philippines Time (PHT) - UTC+8
+            const philippinesTimeOptions = {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true,
+                timeZone: 'Asia/Manila'
+            };
+            philippinesTimeDisplay.textContent = now.toLocaleTimeString('en-US', philippinesTimeOptions);
+        }
+
+        // --- Floating Widgets Toggle Functionality ---
+
+        const WIDGET_COLLAPSED_KEY = 'widgetsCollapsed';
+
+        /**
+         * Toggles the collapsed state of the floating widgets.
+         */
+        function toggleFloatingWidgets() {
+            const isCollapsed = floatingWidgetContainer.classList.toggle('collapsed');
+            localStorage.setItem(WIDGET_COLLAPSED_KEY, isCollapsed);
+            updateToggleButtonIcon(isCollapsed);
+        }
+
+        /**
+         * Updates the icon of the toggle button based on the collapsed state.
+         * @param {boolean} isCollapsed - True if widgets are collapsed, false otherwise.
+         */
+        function updateToggleButtonIcon(isCollapsed) {
+            const icon = toggleWidgetsButton.querySelector('i');
+            if (isCollapsed) {
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            } else {
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            }
+        }
+
+        /**
+         * Loads the initial collapsed state from local storage.
+         */
+        function loadFloatingWidgetsState() {
+            const savedState = localStorage.getItem(WIDGET_COLLAPSED_KEY);
+            if (savedState === 'true') {
+                floatingWidgetContainer.classList.add('collapsed');
+                updateToggleButtonIcon(true);
+            } else {
+                floatingWidgetContainer.classList.remove('collapsed');
+                updateToggleButtonIcon(false);
+            }
+        }
+
+        // Event listener for the toggle button
+        toggleWidgetsButton.addEventListener('click', toggleFloatingWidgets);
+
+        // --- YouTube Player Functions ---
+        /**
+         * Extracts YouTube video ID from various YouTube URL formats.
+         * @param {string} url - The YouTube video URL.
+         * @returns {string|null} The video ID or null if not found.
+         */
+        function getYoutubeVideoId(url) {
+            let videoId = null;
+            const youtubeRegex = /(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+            const match = url.match(youtubeRegex);
+            if (match && match[1]) {
+                videoId = match[1];
+            }
+            return videoId;
+        }
+
+        /**
+         * Loads a YouTube video into the iframe based on the provided video link.
+         */
+        function loadYoutubeVideo() {
+            const videoLink = youtubeVideoLinkInput.value.trim();
+            if (videoLink) {
+                const videoId = getYoutubeVideoId(videoLink);
+                if (videoId) {
+                    youtubePlayer.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&si=h5g-r998jU-6_j1b`;
+                } else {
+                    // Provide feedback for invalid URL
+                    alert("Please enter a valid YouTube video link (e.g., youtube.com/watch?v=VIDEO_ID or youtu.be/VIDEO_ID).");
+                }
+            } else {
+                // If input is empty, revert to default or show error
+                alert("Please enter a YouTube video link.");
+            }
+        }
+
+        // Event listeners for YouTube player
+        loadYoutubeVideoButton.addEventListener('click', loadYoutubeVideo);
+        youtubeVideoLinkInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                loadYoutubeVideo();
+            }
+        });
+
+
+        // Initial calls to render data and set up reminders when the window loads
+        window.onload = () => {
+            loadThemePreference(); // Load theme preference first
+            renderGeneralTodos(); // Render general todos from local storage
+            renderDailyTodos(); // Render daily todos from local storage
+            updateGoalTrackerUI(loadWeeklyGoals()); // Load and update weekly goals
+            calculateDaysLeftInMonth(); // Calculate and display days left in month
+
+            // Initial display of date and clocks
+            updateCurrentDate();
+            updateClocks();
+
+            // Load initial state of floating widgets
+            loadFloatingWidgetsState();
+
+            // Update clocks every second
+            setInterval(updateClocks, 1000);
+        };
+    </script>
+</body>
+</html>
