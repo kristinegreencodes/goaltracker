@@ -3,1412 +3,740 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Daily & Weekly Goals</title>
+    <title>My Ghibli Goals & Projects</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for icons (checkbox, trash, sun, moon, cog, times, edit, save, chevron-down, chevron-up) -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* Ghibli Theme Base */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5;
+            font-family: 'Nunito', sans-serif;
+            background-color: #e3ecd9; /* Soft nature sage green */
+            background-image: radial-gradient(#d1e0c3 1px, transparent 1px);
+            background-size: 20px 20px;
             display: flex;
-            justify-content: center;
-            align-items: flex-start; /* Align items to the start of the cross axis */
+            flex-direction: column;
+            align-items: center;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
+            color: #4a5d4e;
             transition: background-color 0.3s ease;
         }
-        .main-container {
-            display: flex;
-            flex-direction: column; /* Stack columns on small screens */
-            gap: 24px;
+
+        /* Project Tabs - Notion Style */
+        .project-tabs-container {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1300px;
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 5px;
         }
-        @media (min-width: 768px) { /* Medium screens and up */
-            .main-container {
-                flex-direction: row; /* Side-by-side on larger screens */
-            }
+        .project-tab {
+            background-color: #c9d8ba;
+            color: #4a5d4e;
+            padding: 10px 20px;
+            border-radius: 12px 12px 0 0;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            box-shadow: 0 -3px 10px rgba(0,0,0,0.05);
         }
-        .left-panel, .goal-tracker-box, .reminder-box, .calendar-clock-box {
-            background-color: #ffffff;
-            padding: 32px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        .project-tab.active {
+            background-color: #fffdf8;
+            color: #2c3e30;
+            border-bottom: 2px solid #fffdf8;
         }
-        .left-panel {
-            flex: 1;
+        .project-tab:hover:not(.active) {
+            background-color: #b8c9a8;
         }
-        .right-panel {
-            flex: 1;
+        .add-project-btn {
+            background-color: #8da47e;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .add-project-btn:hover { background-color: #79916b; }
+
+        .main-container {
             display: flex;
             flex-direction: column;
             gap: 24px;
+            width: 100%;
+            max-width: 1300px;
         }
-        input[type="text"] {
+        @media (min-width: 992px) {
+            .main-container { flex-direction: row; }
+        }
+
+        /* Panels */
+        .ghibli-panel {
+            background-color: #fffdf8; /* Warm cream */
+            padding: 32px;
+            border-radius: 24px;
+            box-shadow: 0 12px 30px -10px rgba(92, 112, 84, 0.2);
+            border: 2px solid #f0f4eb;
+        }
+        .left-panel { flex: 2; }
+        .right-panel { flex: 1; display: flex; flex-direction: column; gap: 24px; }
+
+        /* Inputs & Textareas */
+        input[type="text"], input[type="date"], textarea {
             padding: 12px 16px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border: 2px solid #dce4d3;
+            background-color: #f8faf5;
+            border-radius: 14px;
             width: 100%;
-            box-sizing: border-box;
             font-size: 16px;
-            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease, color 0.3s ease;
+            font-family: 'Nunito', sans-serif;
+            color: #4a5d4e;
+            transition: all 0.3s ease;
         }
-        input[type="text"]:focus {
+        textarea { resize: vertical; min-height: 80px; }
+        input:focus, textarea:focus {
             outline: none;
-            border-color: #6366f1; /* Indigo-500 */
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3); /* Indigo-500 with opacity */
+            border-color: #8da47e;
+            box-shadow: 0 0 0 4px rgba(141, 164, 126, 0.2);
+            background-color: #fff;
         }
-        button {
-            background-color: #6366f1; /* Indigo-500 */
-            color: #ffffff;
+
+        button.action-btn {
+            background-color: #d4a373; /* Warm earthy orange */
+            color: #fff;
             padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
+            border-radius: 14px;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, color 0.3s ease;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(212, 163, 115, 0.3);
+        }
+        button.action-btn:hover {
+            background-color: #cc945c;
+            transform: translateY(-2px);
+        }
+
+        /* Cute Progress Chart */
+        .progress-container {
+            background: #eef3e8;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 2px dashed #c9d8ba;
+            text-align: center;
+        }
+        .progress-bar-bg {
+            background: #dce4d3;
+            height: 24px;
+            border-radius: 12px;
             width: 100%;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
         }
-        button:hover {
-            background-color: #4f46e5; /* Indigo-600 */
-            transform: translateY(-1px);
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #a7c957, #6a994e);
+            height: 100%;
+            width: 0%;
+            border-radius: 12px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
-        button:active {
-            transform: translateY(0);
+        .cute-runner {
+            position: absolute;
+            right: -10px;
+            top: -4px;
+            font-size: 20px;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+            transition: all 0.3s ease;
         }
+
+        /* Mindmap & List Toggles */
+        .view-toggles {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eef3e8;
+            padding-bottom: 10px;
+        }
+        .view-toggle-btn {
+            background: transparent;
+            color: #8fa382;
+            font-weight: 700;
+            font-size: 16px;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .view-toggle-btn.active {
+            background: #8da47e;
+            color: white;
+        }
+
+        /* To-Do List Styles */
         .todo-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #e5e7eb;
-            transition: border-color 0.3s ease;
-        }
-        .todo-item:last-child {
-            border-bottom: none;
-        }
-        .todo-item.completed .todo-text {
-            text-decoration: line-through;
-            color: #9ca3af;
-        }
-        .todo-item input[type="checkbox"] {
-            margin-right: 12px;
-            width: 20px;
-            height: 20px;
-            accent-color: #6366f1;
-            cursor: pointer;
-        }
-        .todo-item .todo-text {
-            flex-grow: 1;
-            text-align: left;
-            font-size: 16px;
-            color: #374151;
-            word-break: break-word; /* Ensure long text wraps */
-            transition: color 0.3s ease;
-        }
-        .todo-item .action-buttons {
-            display: flex;
-            gap: 8px; /* Space between edit and delete buttons */
-        }
-        .todo-item .edit-btn,
-        .todo-item .delete-btn {
-            background: none;
-            border: none;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 0 4px; /* Adjust padding for spacing */
-            transition: color 0.2s ease-in-out;
-        }
-        .todo-item .edit-btn {
-            color: #22c55e; /* Green-500 */
-        }
-        .todo-item .edit-btn:hover {
-            color: #16a34a; /* Green-600 */
-        }
-        .todo-item .delete-btn {
-            color: #ef4444; /* Red-500 */
-        }
-        .todo-item .delete-btn:hover {
-            color: #dc2626; /* Red-600 */
-        }
-        .goal-circles {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            margin-top: 24px;
-        }
-        .goal-circle {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background-color: #e0e7ff; /* Indigo-100 */
-            border: 2px solid #a5b4fc; /* Indigo-300 */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: #6366f1; /* Indigo-500 */
-            transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, color 0.3s ease;
-        }
-        .goal-circle.completed {
-            background-color: #34d399; /* Green-400 */
-            border-color: #10b981; /* Green-500 */
-            color: #ffffff;
-        }
-        .message-box {
-            background-color: #e0e7ff; /* Indigo-100 */
-            color: #4338ca; /* Indigo-700 */
-            border: 1px solid #a5b4fc; /* Indigo-300 */
             padding: 16px;
-            border-radius: 8px;
-            margin-top: 24px;
-            text-align: left;
-            font-size: 15px;
-            line-height: 1.6;
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-        }
-        .loading-spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: #6366f1;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Calendar and Clock Styles */
-        .calendar-clock-box {
-            padding: 24px; /* Slightly less padding than other boxes */
-            text-align: center;
-        }
-        .calendar-display {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 16px;
-            transition: color 0.3s ease;
-        }
-        .clock-display {
-            font-size: 2.25rem; /* text-4xl */
-            font-weight: 700; /* font-bold */
-            color: #4f46e5; /* Indigo-600 */
-            margin-bottom: 8px;
-            transition: color 0.3s ease;
-        }
-        .clock-label {
-            font-size: 0.9rem;
-            color: #6b7280;
-            margin-bottom: 16px;
-            transition: color 0.3s ease;
-        }
-        .clock-container {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin-top: 16px;
-        }
-        .single-clock {
-            padding: 12px 0;
-            border-top: 1px solid #e5e7eb;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .single-clock:first-child {
-            border-top: none;
-        }
-
-
-        /* Dark Mode Styles */
-        body.dark-mode {
-            background-color: #1a202c; /* Darker background */
-            color: #e2e8f0; /* Light text */
-        }
-        body.dark-mode .left-panel,
-        body.dark-mode .goal-tracker-box,
-        body.dark-mode .reminder-box,
-        body.dark-mode .calendar-clock-box {
-            background-color: #2d3748; /* Darker panel background */
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
-        }
-        body.dark-mode h2,
-        body.dark-mode .text-gray-800,
-        body.dark-mode .calendar-display {
-            color: #e2e8f0; /* Light text for headers */
-        }
-        body.dark-mode .text-gray-600,
-        body.dark-mode .clock-label {
-            color: #cbd5e0; /* Lighter gray text */
-        }
-        body.dark-mode input[type="text"] {
-            background-color: #4a5568; /* Darker input background */
-            border-color: #6366f1; /* Keep border color consistent for focus */
-            color: #e2e8f0; /* Light text in input */
-        }
-        body.dark-mode input[type="text"]::placeholder {
-            color: #a0aec0; /* Lighter placeholder text */
-        }
-        body.dark-mode .todo-item {
-            border-color: #4a5568; /* Darker border for todo items */
-        }
-        body.dark-mode .todo-item .todo-text {
-            color: #e2e8f0; /* Light text for todo items */
-        }
-        body.dark-mode .todo-item.completed .todo-text {
-            color: #718096; /* Darker strikethrough text */
-        }
-        body.dark-mode .no-todos-message,
-        body.dark-mode .no-daily-todos-message {
-            color: #a0aec0; /* Lighter gray for messages */
-        }
-        body.dark-mode .goal-circle {
-            background-color: #4a5568; /* Darker circle background */
-            border-color: #6366f1; /* Keep border color consistent */
-            color: #e2e8f0; /* Light text in circles */
-        }
-        body.dark-mode .goal-circle.completed {
-            background-color: #10b981; /* Green-500 for completed */
-            border-color: #059669; /* Darker green border */
-            color: #ffffff;
-        }
-        body.dark-mode .goal-status,
-        body.dark-mode .days-left {
-            color: #a78bfa; /* Lighter indigo for status */
-        }
-        body.dark-mode .message-box {
-            background-color: #4a5568; /* Darker message box */
-            color: #e2e8f0; /* Light text */
-            border-color: #6366f1; /* Indigo-500 */
-        }
-        body.dark-mode .message-box .text-red-700 {
-            color: #fca5a5; /* Lighter red for errors */
-        }
-        body.dark-mode .clock-display {
-            color: #a78bfa; /* Lighter indigo for clocks */
-        }
-        body.dark-mode .single-clock {
-            border-top-color: #4a5568; /* Darker border for clocks */
-        }
-
-        /* Floating Widget Container */
-        .floating-widget-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            z-index: 999; /* Below settings button */
-            width: 90%; /* Responsive width */
-            max-width: 350px; /* Max width for larger screens */
-            transition: transform 0.3s ease-out; /* Smooth transition for collapsing */
-        }
-
-        /* Collapsed state for the container */
-        .floating-widget-container.collapsed {
-            transform: translateY(calc(100% - 60px)); /* Move up to hide content, leave button visible */
-            /* Height of the toggle button + some margin */
-        }
-
-        .floating-widget-item {
-            background-color: #ffffff;
-            padding: 16px;
+            background: #f8faf5;
+            border: 1px solid #eef3e8;
             border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
         }
-        body.dark-mode .floating-widget-item {
-            background-color: #2d3748;
-            box-shadow: 0 44px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Hide content when container is collapsed */
-        .floating-widget-container.collapsed .floating-widget-item {
-            opacity: 0;
-            transform: translateY(20px); /* Move slightly down while fading out */
-            pointer-events: none; /* Disable interactions */
-            height: 0; /* Collapse height */
-            padding: 0; /* Remove padding */
-            margin: 0; /* Remove margin */
-            overflow: hidden; /* Hide overflow content */
-        }
-
-
-        .youtube-player-container {
-            position: relative;
-            width: 100%;
-            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
-            height: 0;
-            overflow: hidden;
-            border-radius: 8px;
-            margin-top: 12px;
-        }
-        .youtube-player-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: 0;
-        }
-
-        /* Settings Button */
-        .settings-button {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background-color: #6366f1;
-            color: #ffffff;
-            border: none;
-            font-size: 24px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
+        .todo-item:hover { transform: translateX(4px); border-color: #c9d8ba; }
+        .todo-item.completed { opacity: 0.6; }
+        .todo-item.completed .todo-text { text-decoration: line-through; color: #8fa382; }
+        .todo-checkbox { margin-right: 12px; width: 22px; height: 22px; accent-color: #6a994e; cursor: pointer; }
+        .todo-text { flex-grow: 1; font-size: 16px; font-weight: 600; }
+        
+        /* Mindmap Board (Drag & Drop) */
+        .mindmap-board {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, box-shadow 0.2s ease;
-            z-index: 1001; /* Ensured to be above modal overlay (1000) when modal is closed */
+            gap: 16px;
+            overflow-x: auto;
+            min-height: 400px;
         }
-        .settings-button:hover {
-            background-color: #4f46e5;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-        }
-        .settings-button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-        body.dark-mode .settings-button {
-            background-color: #4a5568;
-            color: #e2e8f0;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-        }
-        body.dark-mode .settings-button:hover {
-            background-color: #6366f1;
-        }
-
-        /* Toggle Button for Floating Widgets */
-        .toggle-widgets-button {
-            background-color: #6366f1; /* Indigo-500 */
-            color: #ffffff;
-            border: none;
-            font-size: 20px; /* Slightly smaller than settings button */
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, box-shadow 0.2s ease;
-            align-self: flex-end; /* Align to the right within the flex container */
-            margin-bottom: 16px; /* Space between button and widgets */
-        }
-        .toggle-widgets-button:hover {
-            background-color: #4f46e5;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-        }
-        .toggle-widgets-button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-        body.dark-mode .toggle-widgets-button {
-            background-color: #4a5568;
-            color: #e2e8f0;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-        }
-        body.dark-mode .toggle-widgets-button:hover {
-            background-color: #6366f1;
-        }
-        /* Adjust position for the button within the container */
-        .floating-widget-container.collapsed .toggle-widgets-button {
-            margin-bottom: 0; /* No margin when collapsed, as it's the only visible element */
-        }
-
-
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        .modal-content {
-            background-color: #ffffff;
-            padding: 32px;
+        .mindmap-column {
+            flex: 1;
+            min-width: 250px;
+            background: #f4f7f0;
             border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.15);
-            width: 90%;
-            max-width: 400px;
-            position: relative;
-            transform: translateY(-20px);
-            opacity: 0;
-            transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, color 0.3s ease;
-        }
-        .modal-overlay.active .modal-content {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        .modal-close-button {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: #9ca3af;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-        .modal-close-button:hover {
-            color: #6b7280;
-        }
-        body.dark-mode .modal-content {
-            background-color: #2d3748;
-            color: #e2e8f0;
-        }
-        body.dark-mode .modal-close-button {
-            color: #a0aec0;
-        }
-        body.dark-mode .modal-close-button:hover {
-            color: #cbd5e0;
-        }
-        .modal-content h3 {
-            color: #374151; /* Default light mode color */
-            transition: color 0.3s ease;
-        }
-        body.dark-mode .modal-content h3 {
-            color: #e2e8f0; /* Dark mode color */
-        }
-        .theme-option {
+            padding: 16px;
+            border: 2px dashed #dce4d3;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .mindmap-column-title {
+            font-weight: 800;
+            color: #5c7054;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .mindmap-card {
+            background: white;
             padding: 12px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            cursor: grab;
+            font-weight: 600;
+            border-left: 4px solid #a7c957;
         }
-        body.dark-mode .theme-option {
-            border-color: #4a5568;
-            background-color: #4a5568;
+        .mindmap-card:active { cursor: grabbing; }
+        .mindmap-card.status-doing { border-left-color: #f4a261; }
+        .mindmap-card.status-done { border-left-color: #dce4d3; text-decoration: line-through; color: #a0a0a0; }
+
+        /* Right Panel Modules */
+        .calendar-display { font-size: 1.3rem; font-weight: 800; color: #5c7054; }
+        .clock-display { font-size: 2rem; font-weight: 800; color: #6a994e; }
+        .goal-circle {
+            width: 50px; height: 50px; border-radius: 50%;
+            background-color: #f8faf5; border: 3px solid #dce4d3;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 20px; font-weight: 800; color: #8fa382;
         }
-        .theme-option label {
-            font-size: 16px;
-            font-weight: 500;
-            color: #374151;
-            transition: color 0.3s ease;
+        .goal-circle.completed { background-color: #a7c957; border-color: #6a994e; color: white; }
+
+        /* Dark Mode overrides (Soft earthy dark mode) */
+        body.dark-mode { background-color: #2d312c; background-image: none; color: #eef3e8; }
+        body.dark-mode .ghibli-panel { background-color: #3b4239; border-color: #4a5448; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+        body.dark-mode .project-tab { background-color: #4a5448; color: #b8c9a8; }
+        body.dark-mode .project-tab.active { background-color: #3b4239; color: #eef3e8; border-color:#3b4239; }
+        body.dark-mode input[type="text"], body.dark-mode input[type="date"], body.dark-mode textarea {
+            background-color: #2d312c; border-color: #5c6858; color: #eef3e8;
         }
-        body.dark-mode .theme-option label {
-            color: #e2e8f0;
-        }
-        .theme-option input[type="radio"] {
-            margin-left: 12px;
-            accent-color: #6366f1;
-            width: 18px;
-            height: 18px;
-        }
+        body.dark-mode .todo-item { background: #454d43; border-color: #5c6858; }
+        body.dark-mode .mindmap-column { background: #323830; border-color: #5c6858; }
+        body.dark-mode .mindmap-card { background: #454d43; color: white; }
+        body.dark-mode .progress-container { background: #323830; border-color: #5c6858; }
+        body.dark-mode .calendar-display, body.dark-mode .clock-display { color: #b8c9a8; }
     </style>
 </head>
 <body>
-    <div class="main-container">
-        <!-- Left Panel: To-Do List -->
-        <div class="left-panel">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">General To-Do List</h2>
-            </div>
-            <div class="flex gap-4 mb-6 flex-col sm:flex-row">
-                <input type="text" id="todoInput" placeholder="Add a new general task..." class="flex-grow">
-                <button id="addTodoButton" class="sm:w-auto mt-4 sm:mt-0">Add Task</button>
-            </div>
-            <div id="loadingTodos" class="loading-spinner hidden"></div>
-            <ul id="todoList" class="divide-y divide-gray-200">
-                <!-- General To-do items will be dynamically added here -->
-            </ul>
-            <p id="noTodosMessage" class="text-gray-500 text-center mt-4 hidden">No general tasks yet! Add one above.</p>
+    <!-- Project Tabs -->
+    <div class="project-tabs-container" id="projectTabsContainer">
+        <!-- Tabs generated by JS -->
+    </div>
 
-            <!-- New Daily To-Do List Section -->
-            <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">Daily To-Do List <span id="dailyDateDisplay" class="text-lg font-normal text-gray-600"></span></h2>
-                <div class="flex gap-4 mb-6 flex-col sm:flex-row">
-                    <input type="text" id="dailyTodoInput" placeholder="Add a new daily task..." class="flex-grow">
-                    <button id="addDailyTodoButton" class="sm:w-auto mt-4 sm:mt-0">Add Daily Task</button>
+    <div class="main-container">
+        <!-- Left Panel: Active Project View -->
+        <div class="ghibli-panel left-panel">
+            
+            <!-- Motivation Progress Chart -->
+            <div class="progress-container">
+                <h3 class="text-xl font-bold mb-1" id="motivationText">Let's grow this project! 🌱</h3>
+                <p class="text-sm opacity-70 mb-2" id="progressPercentage">0% Completed</p>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="cuteProgressBar">
+                        <span class="cute-runner" id="cuteProgressIcon">🍃</span>
+                    </div>
                 </div>
-                <div id="loadingDailyTodos" class="loading-spinner hidden"></div>
-                <ul id="dailyTodoList" class="divide-y divide-gray-200">
-                    <!-- Daily To-do items will be dynamically added here -->
-                </ul>
-                <p id="noDailyTodosMessage" class="text-gray-500 text-center mt-4 hidden">No daily tasks yet! Add one above.</p>
             </div>
+
+            <!-- Project Meta Information -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label class="block text-sm font-bold mb-1 ml-1 opacity-80">Project Name</label>
+                    <input type="text" id="projName" placeholder="e.g. My Ghibli Masterpiece" onchange="saveActiveProjectMeta()">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold mb-1 ml-1 opacity-80">Deadline</label>
+                    <input type="date" id="projDeadline" onchange="saveActiveProjectMeta()">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-bold mb-1 ml-1 opacity-80">Purpose & Goal</label>
+                    <textarea id="projPurpose" placeholder="What is the core purpose and goal of this project?" onchange="saveActiveProjectMeta()"></textarea>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-bold mb-1 ml-1 opacity-80">Mission / Notes</label>
+                    <textarea id="projMission" placeholder="Free space for mission statement or notes..." onchange="saveActiveProjectMeta()"></textarea>
+                </div>
+            </div>
+
+            <hr class="my-6 border-t-2 border-[#eef3e8] dark:border-[#4a5448]">
+
+            <!-- View Toggles -->
+            <div class="view-toggles">
+                <button class="view-toggle-btn active" id="btnListView" onclick="switchView('list')"><i class="fas fa-list mr-2"></i> To-Do List</button>
+                <button class="view-toggle-btn" id="btnBoardView" onclick="switchView('board')"><i class="fas fa-sitemap mr-2"></i> Mindmap Board</button>
+            </div>
+
+            <!-- List View -->
+            <div id="listView">
+                <div class="flex gap-4 mb-6 flex-col sm:flex-row">
+                    <input type="text" id="todoInput" placeholder="Add a new task for this project..." class="flex-grow">
+                    <button id="addTodoButton" class="action-btn sm:w-auto mt-4 sm:mt-0">Add Task</button>
+                </div>
+                <ul id="todoList" class="divide-y divide-transparent">
+                    <!-- Project To-do items will be dynamically added here -->
+                </ul>
+                <p id="noTodosMessage" class="text-center mt-4 opacity-60 font-bold hidden">No tasks yet! Add one above.</p>
+            </div>
+
+            <!-- Mindmap Board View (Kanban style) -->
+            <div id="boardView" class="hidden">
+                <p class="text-sm opacity-70 mb-4 text-center">Drag and drop your tasks to organize your workflow.</p>
+                <div class="mindmap-board">
+                    <div class="mindmap-column" id="col-todo" ondrop="drop(event, 'todo')" ondragover="allowDrop(event)">
+                        <div class="mindmap-column-title">To Do</div>
+                        <!-- Items injected by JS -->
+                    </div>
+                    <div class="mindmap-column" id="col-doing" ondrop="drop(event, 'doing')" ondragover="allowDrop(event)">
+                        <div class="mindmap-column-title">Doing</div>
+                    </div>
+                    <div class="mindmap-column" id="col-done" ondrop="drop(event, 'done')" ondragover="allowDrop(event)">
+                        <div class="mindmap-column-title">Done</div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <!-- Right Panel -->
         <div class="right-panel">
+            
             <!-- Calendar and Clocks -->
-            <div class="calendar-clock-box">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Today's Date & Time</h2>
-                <div id="currentDateDisplay" class="calendar-display"></div>
-                <div class="clock-container">
-                    <div class="single-clock">
+            <div class="ghibli-panel text-center">
+                <h2 class="text-xl font-bold mb-4">Today's Journey</h2>
+                <div id="currentDateDisplay" class="calendar-display mb-4"></div>
+                <div class="flex flex-col gap-4 mt-4">
+                    <div class="border-t border-[#eef3e8] dark:border-[#4a5448] pt-4">
                         <div id="centralTime" class="clock-display"></div>
-                        <div class="clock-label">Central Time (CT)</div>
+                        <div class="text-sm font-bold opacity-60">Central Time (CT)</div>
                     </div>
-                    <div class="single-clock">
+                    <div class="border-t border-[#eef3e8] dark:border-[#4a5448] pt-4">
                         <div id="philippinesTime" class="clock-display"></div>
-                        <div class="clock-label">Philippines Time (PHT)</div>
+                        <div class="text-sm font-bold opacity-60">Philippines Time (PHT)</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Upper Right: Weekly Goal Tracker -->
-            <div class="goal-tracker-box">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Weekly Goal Tracker</h2>
-                <p class="text-gray-600 text-center mb-4">Complete 3 tasks this week to meet your goal!</p>
-                <div class="goal-circles">
+            <!-- Daily Routine Tasks (Global) -->
+            <div class="ghibli-panel">
+                <h2 class="text-xl font-bold mb-4">Daily Routine <span id="dailyDateDisplay" class="text-sm font-normal opacity-70 block mt-1"></span></h2>
+                <div class="flex gap-2 mb-4 flex-col sm:flex-row">
+                    <input type="text" id="dailyTodoInput" placeholder="Add daily habit..." class="flex-grow text-sm p-2">
+                    <button id="addDailyTodoButton" class="action-btn !p-2 !text-sm">Add</button>
+                </div>
+                <ul id="dailyTodoList">
+                    <!-- Daily To-do items -->
+                </ul>
+            </div>
+
+            <!-- Weekly Goal Tracker -->
+            <div class="ghibli-panel text-center">
+                <h2 class="text-xl font-bold mb-4">Weekly Milestone</h2>
+                <p class="text-sm opacity-80 mb-4">Complete 3 major tasks this week!</p>
+                <div class="flex justify-center gap-4 mt-4">
                     <div id="goalCircle1" class="goal-circle">1</div>
                     <div id="goalCircle2" class="goal-circle">2</div>
                     <div id="goalCircle3" class="goal-circle">3</div>
                 </div>
-                <p id="goalStatus" class="text-center text-lg font-semibold mt-6 text-indigo-700">Progress: 0/3</p>
-                <p id="goalMetMessage" class="text-center text-green-600 font-bold text-xl mt-4 hidden">Goal Achieved this Week! 🎉</p>
+                <p id="goalStatus" class="font-bold mt-6 text-[#6a994e]">Progress: 0/3</p>
+                <p id="goalMetMessage" class="font-bold text-xl mt-2 hidden">Goal Achieved! 🎉</p>
             </div>
 
-            <!-- Bottom Right: Monthly Reminder -->
-            <div class="reminder-box">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Monthly Reminder</h2>
-                <p id="daysLeft" class="text-center text-3xl font-bold text-indigo-700">-- Days Left</p>
+            <!-- Monthly Reminder -->
+            <div class="ghibli-panel text-center">
+                <h2 class="text-xl font-bold mb-2">Monthly Timer</h2>
+                <p id="daysLeft" class="text-2xl font-extrabold text-[#d4a373]">-- Days Left</p>
             </div>
-        </div>
-    </div>
-
-    <!-- Floating Player Section -->
-    <div id="floatingWidgetContainer" class="floating-widget-container">
-        <!-- Toggle button for the widgets -->
-        <button id="toggleWidgetsButton" class="toggle-widgets-button">
-            <i class="fas fa-chevron-down"></i>
-        </button>
-
-        <div class="floating-widget-item">
-            <h3 class="text-lg font-bold text-gray-800 mb-3">Music Player</h3>
-            <p class="text-sm text-gray-600 mb-2">
-                Enter YouTube Video Link 
-               
-            </p>
-            <div class="flex gap-2 mb-3">
-                <input type="text" id="youtubeVideoLinkInput" placeholder="Enter video link..." class="flex-grow text-sm">
-                <button id="loadYoutubeVideoButton" class="w-auto px-4 py-2 text-sm">Load</button>
-            </div>
-            <div class="youtube-player-container">
-                <!-- Default YouTube Embed: Lo-fi Hip Hop Radio - Beats to Relax/Study To -->
-                <iframe id="youtubePlayer" src="https://www.youtube.com/embed/jfKfPfyJRdk?si=h5g-r998jU-6_j1b"
-                        title="YouTube video player" frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            </div>
-        </div>
-        <!-- Removed News Section -->
-    </div>
-
-    <!-- Settings Button (moved outside main-container for fixed positioning) -->
-    <button id="settingsButton" class="settings-button">
-        <i class="fas fa-cog"></i>
-    </button>
-
-    <!-- Settings Modal -->
-    <div id="settingsModalOverlay" class="modal-overlay">
-        <div class="modal-content">
-            <button id="closeSettingsModal" class="modal-close-button">
-                <i class="fas fa-times"></i>
+            
+            <!-- Settings Button (Inline for Right Panel) -->
+            <button onclick="toggleTheme()" class="action-btn !bg-[#8da47e] hover:!bg-[#79916b]">
+                <i class="fas fa-moon mr-2"></i> Toggle Dark/Light Theme
             </button>
-            <h3 class="text-xl font-bold text-gray-800 mb-6">Settings</h3>
-
-            <div class="mb-4">
-                <h4 class="text-lg font-semibold text-gray-700 mb-4">Theme</h4>
-                <div class="theme-option">
-                    <label for="darkModeRadio" class="cursor-pointer">
-                        <i class="fas fa-moon mr-2"></i> Dark Mode
-                    </label>
-                    <input type="radio" id="darkModeRadio" name="theme" value="dark">
-                </div>
-                <div class="theme-option">
-                    <label for="lightModeRadio" class="cursor-pointer">
-                        <i class="fas fa-sun mr-2"></i> Light Mode
-                    </label>
-                    <input type="radio" id="lightModeRadio" name="theme" value="light">
-                </div>
-            </div>
-            <!-- Add more settings options here if needed in the future -->
         </div>
     </div>
 
-    <script type="module">
-        // Get references to HTML elements
+    <script>
+        // --- Core Data Structures ---
+        let projects = JSON.parse(localStorage.getItem('ghibli_projects')) || [
+            { id: 'default_1', name: 'My First Project', deadline: '', purpose: '', goal: '', mission: '', todos: [] }
+        ];
+        let activeProjectId = localStorage.getItem('ghibli_active_project') || projects[0].id;
+
+        // --- DOM Elements ---
+        const tabsContainer = document.getElementById('projectTabsContainer');
+        const projNameInput = document.getElementById('projName');
+        const projDeadlineInput = document.getElementById('projDeadline');
+        const projPurposeInput = document.getElementById('projPurpose');
+        const projMissionInput = document.getElementById('projMission');
+        
         const todoInput = document.getElementById('todoInput');
         const addTodoButton = document.getElementById('addTodoButton');
         const todoList = document.getElementById('todoList');
         const noTodosMessage = document.getElementById('noTodosMessage');
-        const loadingTodos = document.getElementById('loadingTodos');
 
-        const dailyTodoInput = document.getElementById('dailyTodoInput');
-        const addDailyTodoButton = document.getElementById('addDailyTodoButton');
-        const dailyTodoList = document.getElementById('dailyTodoList');
-        const noDailyTodosMessage = document.getElementById('noDailyTodosMessage');
-        const loadingDailyTodos = document.getElementById('loadingDailyTodos');
-        const dailyDateDisplay = document.getElementById('dailyDateDisplay');
+        const btnListView = document.getElementById('btnListView');
+        const btnBoardView = document.getElementById('btnBoardView');
+        const listView = document.getElementById('listView');
+        const boardView = document.getElementById('boardView');
 
-        const goalCircle1 = document.getElementById('goalCircle1');
-        const goalCircle2 = document.getElementById('goalCircle2');
-        const goalCircle3 = document.getElementById('goalCircle3');
-        const goalStatus = document.getElementById('goalStatus');
-        const goalMetMessage = document.getElementById('goalMetMessage');
-
-        const daysLeftElement = document.getElementById('daysLeft');
-
-        // Calendar and Clock elements
-        const currentDateDisplay = document.getElementById('currentDateDisplay');
-        const centralTimeDisplay = document.getElementById('centralTime');
-        const philippinesTimeDisplay = document.getElementById('philippinesTime');
-
-        // Settings Modal elements
-        const settingsButton = document.getElementById('settingsButton');
-        const settingsModalOverlay = document.getElementById('settingsModalOverlay');
-        const closeSettingsModal = document.getElementById('closeSettingsModal');
-        const darkModeRadio = document.getElementById('darkModeRadio');
-        const lightModeRadio = document.getElementById('lightModeRadio');
-        const body = document.body;
-
-        // Floating Widgets elements
-        const floatingWidgetContainer = document.getElementById('floatingWidgetContainer');
-        const toggleWidgetsButton = document.getElementById('toggleWidgetsButton');
-        // YouTube Player elements
-        const youtubeVideoLinkInput = document.getElementById('youtubeVideoLinkInput'); // Changed to Link Input
-        const loadYoutubeVideoButton = document.getElementById('loadYoutubeVideoButton');
-        const youtubePlayer = document.getElementById('youtubePlayer');
-
-
-        // --- Theme Management Functions ---
-        const THEME_STORAGE_KEY = 'themePreference';
-
-        /**
-         * Enables dark mode by adding the 'dark-mode' class to the body.
-         * Sets the dark mode radio button to checked.
-         */
-        function enableDarkMode() {
-            body.classList.add('dark-mode');
-            localStorage.setItem(THEME_STORAGE_KEY, 'dark');
-            if (darkModeRadio) darkModeRadio.checked = true;
+        // --- Project Management Functions ---
+        function saveProjects() {
+            localStorage.setItem('ghibli_projects', JSON.stringify(projects));
+            localStorage.setItem('ghibli_active_project', activeProjectId);
+            updateProgressChart();
         }
 
-        /**
-         * Disables dark mode by removing the 'dark-mode' class from the body.
-         * Sets the light mode radio button to checked.
-         */
-        function disableDarkMode() {
-            body.classList.remove('dark-mode');
-            localStorage.setItem(THEME_STORAGE_KEY, 'light');
-            if (lightModeRadio) lightModeRadio.checked = true;
+        function getActiveProject() {
+            return projects.find(p => p.id === activeProjectId) || projects[0];
         }
 
-        /**
-         * Loads the theme preference from local storage or sets dark mode as default.
-         */
-        function loadThemePreference() {
-            const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-            if (savedTheme === 'light') {
-                disableDarkMode();
-            } else { // Default to dark mode if no preference or 'dark'
-                enableDarkMode();
+        function renderTabs() {
+            tabsContainer.innerHTML = '';
+            projects.forEach(proj => {
+                const tab = document.createElement('div');
+                tab.className = `project-tab ${proj.id === activeProjectId ? 'active' : ''}`;
+                tab.textContent = proj.name || 'Untitled Project';
+                tab.onclick = () => {
+                    activeProjectId = proj.id;
+                    saveProjects();
+                    renderTabs();
+                    loadActiveProject();
+                };
+                tabsContainer.appendChild(tab);
+            });
+            const addBtn = document.createElement('button');
+            addBtn.className = 'add-project-btn';
+            addBtn.innerHTML = '<i class="fas fa-plus"></i> New Project';
+            addBtn.onclick = addNewProject;
+            tabsContainer.appendChild(addBtn);
+        }
+
+        function addNewProject() {
+            const newId = 'proj_' + Date.now();
+            projects.push({ id: newId, name: 'New Project', deadline: '', purpose: '', goal: '', mission: '', todos: [] });
+            activeProjectId = newId;
+            saveProjects();
+            renderTabs();
+            loadActiveProject();
+        }
+
+        function loadActiveProject() {
+            const proj = getActiveProject();
+            projNameInput.value = proj.name;
+            projDeadlineInput.value = proj.deadline;
+            projPurposeInput.value = proj.purpose;
+            projMissionInput.value = proj.mission;
+            renderProjectTodos();
+            renderMindmapBoard();
+            updateProgressChart();
+        }
+
+        function saveActiveProjectMeta() {
+            const proj = getActiveProject();
+            proj.name = projNameInput.value;
+            proj.deadline = projDeadlineInput.value;
+            proj.purpose = projPurposeInput.value;
+            proj.mission = projMissionInput.value;
+            saveProjects();
+            renderTabs(); // Update tab name
+        }
+
+        // --- Project To-Do & Mindmap Functions ---
+        function addProjectTodo(text) {
+            const proj = getActiveProject();
+            proj.todos.push({
+                id: 'todo_' + Date.now(),
+                text: text,
+                status: 'todo', // Can be 'todo', 'doing', 'done'
+                completed: false,
+                timestamp: Date.now()
+            });
+            saveProjects();
+            renderProjectTodos();
+            renderMindmapBoard();
+        }
+
+        function updateProjectTodo(id, updates) {
+            const proj = getActiveProject();
+            const todo = proj.todos.find(t => t.id === id);
+            if (todo) {
+                Object.assign(todo, updates);
+                // Sync status and completed flag
+                if (updates.completed !== undefined) {
+                    todo.status = updates.completed ? 'done' : (todo.status === 'done' ? 'todo' : todo.status);
+                    if(updates.completed) incrementWeeklyGoal();
+                }
+                if (updates.status !== undefined) {
+                    todo.completed = (updates.status === 'done');
+                }
+                saveProjects();
+                renderProjectTodos();
+                renderMindmapBoard();
             }
         }
 
-        // Event listeners for theme radio buttons
-        if (darkModeRadio) {
-            darkModeRadio.addEventListener('change', () => {
-                if (darkModeRadio.checked) {
-                    enableDarkMode();
-                }
-            });
-        }
-        if (lightModeRadio) {
-            lightModeRadio.addEventListener('change', () => {
-                if (lightModeRadio.checked) {
-                    disableDarkMode();
-                }
-            });
+        function deleteProjectTodo(id) {
+            const proj = getActiveProject();
+            proj.todos = proj.todos.filter(t => t.id !== id);
+            saveProjects();
+            renderProjectTodos();
+            renderMindmapBoard();
         }
 
-        // --- Settings Modal Functions ---
-        settingsButton.addEventListener('click', () => {
-            console.log('Settings button clicked!'); // Debugging log
-            settingsModalOverlay.classList.add('active');
-            // Ensure radio buttons reflect current theme when modal opens
-            loadThemePreference();
-        });
-
-        closeSettingsModal.addEventListener('click', () => {
-            settingsModalOverlay.classList.remove('active');
-        });
-
-        // Close modal when clicking outside of it
-        settingsModalOverlay.addEventListener('click', (e) => {
-            if (e.target === settingsModalOverlay) {
-                settingsModalOverlay.classList.remove('active');
-            }
-        });
-
-        // --- General To-Do List Functions ---
-
-        /**
-         * Loads general to-do items from local storage.
-         * @returns {Array} An array of to-do items.
-         */
-        function loadGeneralTodos() {
-            const todosJson = localStorage.getItem('generalTodos');
-            return todosJson ? JSON.parse(todosJson) : [];
-        }
-
-        /**
-         * Saves general to-do items to local storage.
-         * @param {Array} todos - The array of to-do items to save.
-         */
-        function saveGeneralTodos(todos) {
-            localStorage.setItem('generalTodos', JSON.stringify(todos));
-            renderGeneralTodos(); // Re-render after saving
-        }
-
-        /**
-         * Renders all general to-do items in the UI.
-         */
-        function renderGeneralTodos() {
-            const todos = loadGeneralTodos();
-            todoList.innerHTML = ''; // Clear current list
-            loadingTodos.classList.add('hidden'); // Hide loading spinner
-
-            if (todos.length === 0) {
+        function renderProjectTodos() {
+            const proj = getActiveProject();
+            todoList.innerHTML = '';
+            if (proj.todos.length === 0) {
                 noTodosMessage.classList.remove('hidden');
             } else {
                 noTodosMessage.classList.add('hidden');
-                // Sort by timestamp (latest first) before rendering
-                todos.sort((a, b) => b.timestamp - a.timestamp);
-                todos.forEach(todo => {
-                    renderTodoItem(todo.id, todo.text, todo.completed, todoList, updateGeneralTodoStatus, deleteGeneralTodoItem, updateGeneralTodoText);
+                const sorted = [...proj.todos].sort((a, b) => b.timestamp - a.timestamp);
+                sorted.forEach(todo => {
+                    const li = document.createElement('li');
+                    li.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+                    
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox'; cb.className = 'todo-checkbox';
+                    cb.checked = todo.completed;
+                    cb.onchange = (e) => updateProjectTodo(todo.id, { completed: e.target.checked });
+                    
+                    const textSpan = document.createElement('span');
+                    textSpan.className = 'todo-text';
+                    textSpan.textContent = todo.text;
+                    
+                    const delBtn = document.createElement('button');
+                    delBtn.innerHTML = '<i class="fas fa-trash text-red-400 hover:text-red-600"></i>';
+                    delBtn.onclick = () => deleteProjectTodo(todo.id);
+
+                    li.append(cb, textSpan, delBtn);
+                    todoList.appendChild(li);
                 });
             }
         }
 
-        /**
-         * Adds a new general to-do item to local storage.
-         * @param {string} text - The text content of the new to-do item.
-         */
-        function addGeneralTodo(text) {
-            const todos = loadGeneralTodos();
-            const newTodo = {
-                id: Date.now().toString(), // Unique ID for the todo
-                text: text,
-                completed: false,
-                timestamp: Date.now()
-            };
-            todos.push(newTodo);
-            saveGeneralTodos(todos);
-            todoInput.value = ''; // Clear input field
+        // --- Drag and Drop Mindmap Logic ---
+        function renderMindmapBoard() {
+            const proj = getActiveProject();
+            document.getElementById('col-todo').innerHTML = '<div class="mindmap-column-title">To Do</div>';
+            document.getElementById('col-doing').innerHTML = '<div class="mindmap-column-title">Doing</div>';
+            document.getElementById('col-done').innerHTML = '<div class="mindmap-column-title">Done</div>';
+
+            proj.todos.forEach(todo => {
+                const card = document.createElement('div');
+                card.className = `mindmap-card status-${todo.status}`;
+                card.draggable = true;
+                card.dataset.id = todo.id;
+                card.textContent = todo.text;
+                card.ondragstart = (e) => { e.dataTransfer.setData('text/plain', todo.id); };
+                
+                const col = document.getElementById(`col-${todo.status}`) || document.getElementById('col-todo');
+                col.appendChild(card);
+            });
         }
 
-        /**
-         * Updates the completion status of a general to-do item in local storage.
-         * @param {string} id - The ID of the to-do item.
-         * @param {boolean} completed - The new completion status.
-         */
-        function updateGeneralTodoStatus(id, completed) {
-            const todos = loadGeneralTodos();
-            const todoIndex = todos.findIndex(todo => todo.id === id);
-            if (todoIndex > -1) {
-                todos[todoIndex].completed = completed;
-                saveGeneralTodos(todos);
-                // If completed, increment weekly goal and remove after delay
-                if (completed) {
-                    incrementWeeklyGoal();
-                    setTimeout(() => {
-                        deleteGeneralTodoItem(id);
-                    }, 500);
-                }
-            }
+        function allowDrop(ev) { ev.preventDefault(); }
+        
+        function drop(ev, newStatus) {
+            ev.preventDefault();
+            const todoId = ev.dataTransfer.getData('text/plain');
+            updateProjectTodo(todoId, { status: newStatus });
         }
 
-        /**
-         * Updates the text of a general to-do item in local storage.
-         * @param {string} id - The ID of the to-do item.
-         * @param {string} newText - The new text content.
-         */
-        function updateGeneralTodoText(id, newText) {
-            const todos = loadGeneralTodos();
-            const todoIndex = todos.findIndex(todo => todo.id === id);
-            if (todoIndex > -1) {
-                todos[todoIndex].text = newText;
-                saveGeneralTodos(todos);
-            }
-        }
-
-        /**
-         * Deletes a general to-do item from local storage.
-         * @param {string} id - The ID of the to-do item.
-         */
-        function deleteGeneralTodoItem(id) {
-            let todos = loadGeneralTodos();
-            todos = todos.filter(todo => todo.id !== id);
-            saveGeneralTodos(todos);
-        }
-
-        // Event listener for adding a new general to-do
-        addTodoButton.addEventListener('click', () => {
-            const text = todoInput.value.trim();
-            if (text) {
-                addGeneralTodo(text);
+        function switchView(view) {
+            if (view === 'list') {
+                btnListView.classList.add('active');
+                btnBoardView.classList.remove('active');
+                listView.classList.remove('hidden');
+                boardView.classList.add('hidden');
             } else {
-                const errorMessageDiv = document.createElement('div');
-                errorMessageDiv.className = 'message-box bg-red-100 text-red-700 border-red-300 mt-4';
-                errorMessageDiv.textContent = `Please enter a general task!`;
-                todoInput.after(errorMessageDiv); // Place error message after input
-                setTimeout(() => errorMessageDiv.remove(), 3000); // Remove after 3 seconds
+                btnBoardView.classList.add('active');
+                btnListView.classList.remove('active');
+                boardView.classList.remove('hidden');
+                listView.classList.add('hidden');
             }
-        });
+        }
 
+        // --- Cute Motivation Chart ---
+        function updateProgressChart() {
+            const proj = getActiveProject();
+            const total = proj.todos.length;
+            const completed = proj.todos.filter(t => t.completed).length;
+            let percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+            
+            document.getElementById('cuteProgressBar').style.width = `${percent}%`;
+            document.getElementById('progressPercentage').textContent = `${percent}% Completed`;
+            
+            const icon = document.getElementById('cuteProgressIcon');
+            const text = document.getElementById('motivationText');
+            
+            if (percent === 0) { icon.textContent = '🌱'; text.textContent = "Time to plant some seeds! 🌱"; }
+            else if (percent < 50) { icon.textContent = '🌿'; text.textContent = "Keep going, it's growing! 🌿"; }
+            else if (percent < 100) { icon.textContent = '🏃'; text.textContent = "Almost there! 🏃"; }
+            else { icon.textContent = '🌳'; text.textContent = "Masterpiece Completed! 🌳"; }
+        }
+
+        // Add Todo Listeners
+        addTodoButton.onclick = () => {
+            const val = todoInput.value.trim();
+            if (val) { addProjectTodo(val); todoInput.value = ''; }
+        };
         todoInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                addTodoButton.click();
-            }
-        });
-
-        // --- Daily To-Do List Functions ---
-
-        /**
-         * Gets the local storage key for today's daily todos.
-         * @returns {string} - The key based on the current date (dailyTodos_YYYY-MM-DD).
-         */
-        function getDailyTodoStorageKey() {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
-            const day = String(today.getDate()).padStart(2, '0');
-            return `dailyTodos_${year}-${month}-${day}`;
-        }
-
-        /**
-         * Loads daily to-do items from local storage for the current day.
-         * Resets the list if it's a new day.
-         * @returns {Array} An array of daily to-do items.
-         */
-        function loadDailyTodos() {
-            const todayKey = getDailyTodoStorageKey();
-            const lastLoadedDate = localStorage.getItem('lastDailyTodoDate');
-
-            // If it's a new day, clear previous daily todos
-            if (lastLoadedDate !== todayKey) {
-                localStorage.removeItem(lastLoadedDate); // Clear old day's data
-                localStorage.setItem('lastDailyTodoDate', todayKey); // Update last loaded date
-                return []; // Start with an empty list for the new day
-            }
-
-            const todosJson = localStorage.getItem(todayKey);
-            return todosJson ? JSON.parse(todosJson) : [];
-        }
-
-        /**
-         * Saves daily to-do items to local storage for the current day.
-         * @param {Array} todos - The array of daily to-do items to save.
-         */
-        function saveDailyTodos(todos) {
-            const todayKey = getDailyTodoStorageKey();
-            localStorage.setItem(todayKey, JSON.stringify(todos));
-            localStorage.setItem('lastDailyTodoDate', todayKey); // Keep track of the date saved
-            renderDailyTodos(); // Re-render after saving
-        }
-
-        /**
-         * Renders all daily to-do items in the UI.
-         */
-        function renderDailyTodos() {
-            const dailyTodos = loadDailyTodos();
-            dailyTodoList.innerHTML = ''; // Clear current daily list
-            loadingDailyTodos.classList.add('hidden'); // Hide loading spinner
-
-            const today = new Date();
-            const monthName = today.toLocaleString('default', { month: 'long' });
-            const dayOfMonth = today.getDate();
-            const year = today.getFullYear();
-            dailyDateDisplay.textContent = `(${monthName} ${dayOfMonth}, ${year})`; // Display current date in text format
-
-            if (dailyTodos.length === 0) {
-                noDailyTodosMessage.classList.remove('hidden');
-            } else {
-                noDailyTodosMessage.classList.add('hidden');
-                // Sort by timestamp (latest first) before rendering
-                dailyTodos.sort((a, b) => b.timestamp - a.timestamp);
-                dailyTodos.forEach(todo => {
-                    renderTodoItem(todo.id, todo.text, todo.completed, dailyTodoList, updateDailyTodoStatus, deleteDailyTodoItem, updateDailyTodoText);
-                });
-            }
-        }
-
-        /**
-         * Adds a new daily to-do item to local storage.
-         * @param {string} text - The text content of the new daily to-do item.
-         */
-        function addDailyTodo(text) {
-            const dailyTodos = loadDailyTodos();
-            const newTodo = {
-                id: Date.now().toString(),
-                text: text,
-                completed: false,
-                timestamp: Date.now()
-            };
-            dailyTodos.push(newTodo);
-            saveDailyTodos(dailyTodos);
-            dailyTodoInput.value = ''; // Clear input field
-        }
-
-        /**
-         * Updates the completion status of a daily to-do item in local storage.
-         * @param {string} id - The ID of the daily to-do item.
-         * @param {boolean} completed - The new completion status.
-         */
-        function updateDailyTodoStatus(id, completed) {
-            const dailyTodos = loadDailyTodos();
-            const todoIndex = dailyTodos.findIndex(todo => todo.id === id);
-            if (todoIndex > -1) {
-                dailyTodos[todoIndex].completed = completed;
-                saveDailyTodos(dailyTodos);
-                // For daily tasks, we typically delete them on completion rather than incrementing a goal
-                if (completed) {
-                    setTimeout(() => {
-                        deleteDailyTodoItem(id);
-                    }, 500);
-                }
-            }
-        }
-
-        /**
-         * Updates the text of a daily to-do item in local storage.
-         * @param {string} id - The ID of the daily to-do item.
-         * @param {string} newText - The new text content.
-         */
-        function updateDailyTodoText(id, newText) {
-            const dailyTodos = loadDailyTodos();
-            const todoIndex = dailyTodos.findIndex(todo => todo.id === id);
-            if (todoIndex > -1) {
-                dailyTodos[todoIndex].text = newText;
-                saveDailyTodos(dailyTodos);
-            }
-        }
-
-        /**
-         * Deletes a daily to-do item from local storage.
-         * @param {string} id - The ID of the daily to-do item.
-         */
-        function deleteDailyTodoItem(id) {
-            let dailyTodos = loadDailyTodos();
-            dailyTodos = dailyTodos.filter(todo => todo.id !== id);
-            saveDailyTodos(dailyTodos);
-        }
-
-        // Event listener for adding a new daily to-do
-        addDailyTodoButton.addEventListener('click', () => {
-            const text = dailyTodoInput.value.trim();
-            if (text) {
-                addDailyTodo(text);
-            } else {
-                const errorMessageDiv = document.createElement('div');
-                errorMessageDiv.className = 'message-box bg-red-100 text-red-700 border-red-300 mt-4';
-                errorMessageDiv.textContent = `Please enter a daily task!`;
-                dailyTodoInput.after(errorMessageDiv);
-                setTimeout(() => errorMessageDiv.remove(), 3000);
-            }
-        });
-
-        dailyTodoInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                addDailyTodoButton.click();
-            }
+            if(e.key === 'Enter') addTodoButton.click();
         });
 
 
-        /**
-         * Renders a single to-do item (general or daily) in the UI.
-         * This is a generalized function used by both lists.
-         * @param {string} id - The unique ID for the todo item.
-         * @param {string} text - The text content of the to-do item.
-         * @param {boolean} completed - Whether the to-do item is completed.
-         * @param {HTMLElement} parentListElement - The <ul> element to append to.
-         * @param {Function} updateStatusFunction - The function to call to update status (updateGeneralTodoStatus or updateDailyTodoStatus).
-         * @param {Function} deleteFunction - The function to call to delete item (deleteGeneralTodoItem or deleteDailyTodoItem).
-         * @param {Function} updateTextFunction - The function to call to update text (updateGeneralTodoText or updateDailyTodoText).
-         */
-        function renderTodoItem(id, text, completed, parentListElement, updateStatusFunction, deleteFunction, updateTextFunction) {
-            const listItem = document.createElement('li');
-            listItem.className = `todo-item ${completed ? 'completed' : ''}`;
-            listItem.dataset.id = id;
-
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.checked = completed;
-            checkbox.className = 'todo-checkbox';
-
-            const textSpan = document.createElement('span');
-            textSpan.className = 'todo-text';
-            textSpan.textContent = text;
-
-            const actionButtonsDiv = document.createElement('div');
-            actionButtonsDiv.className = 'action-buttons';
-
-            const editButton = document.createElement('button');
-            editButton.className = 'edit-btn';
-            editButton.innerHTML = '<i class="fas fa-edit"></i>';
-
-            const deleteButton = document.createElement('button');
-            deleteButton.className = 'delete-btn';
-            deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
-
-            actionButtonsDiv.appendChild(editButton);
-            actionButtonsDiv.appendChild(deleteButton);
-
-            listItem.appendChild(checkbox);
-            listItem.appendChild(textSpan);
-            listItem.appendChild(actionButtonsDiv);
-            parentListElement.appendChild(listItem);
-
-            // Event listeners
-            checkbox.addEventListener('change', (e) => {
-                const isChecked = e.target.checked;
-                updateStatusFunction(id, isChecked);
-            });
-
-            deleteButton.addEventListener('click', () => {
-                if (confirm("Are you sure you want to delete this task?")) {
-                    deleteFunction(id);
-                }
-            });
-
-            editButton.addEventListener('click', function editHandler() {
-                // Toggle to edit mode
-                if (textSpan.style.display !== 'none') {
-                    const editInput = document.createElement('input');
-                    editInput.type = 'text';
-                    editInput.className = 'flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500';
-                    editInput.value = textSpan.textContent;
-                    textSpan.style.display = 'none'; // Hide the span
-                    listItem.insertBefore(editInput, actionButtonsDiv); // Insert input before buttons
-                    editInput.focus();
-
-                    // Change edit button to save button
-                    editButton.innerHTML = '<i class="fas fa-save"></i>';
-                    editButton.classList.remove('edit-btn');
-                    editButton.classList.add('save-btn');
-                    editButton.style.color = '#3b82f6'; /* Blue-500 for save */
-
-                    const saveChanges = () => {
-                        const newText = editInput.value.trim();
-                        if (newText && newText !== textSpan.textContent) {
-                            updateTextFunction(id, newText);
-                        }
-                        // Revert to display mode
-                        textSpan.textContent = newText;
-                        textSpan.style.display = 'block'; // Show the span
-                        editInput.remove(); // Remove the input field
-
-                        // Change save button back to edit button
-                        editButton.innerHTML = '<i class="fas fa-edit"></i>';
-                        editButton.classList.remove('save-btn');
-                        editButton.classList.add('edit-btn');
-                        editButton.style.color = '#22c55e'; /* Green-500 for edit */
-
-                        // Re-add the original edit handler
-                        editButton.removeEventListener('click', saveChanges);
-                        editButton.addEventListener('click', editHandler);
-                    };
-
-                    editInput.addEventListener('keypress', (e) => {
-                        if (e.key === 'Enter') {
-                            saveChanges();
-                        }
-                    });
-
-                    // Remove current edit handler and add save handler
-                    editButton.removeEventListener('click', editHandler);
-                    editButton.addEventListener('click', saveChanges);
-                }
-            });
-        }
-
-        // --- Weekly Goal Tracker Functions ---
-
-        /**
-         * Gets the local storage key for the current week's goals.
-         * @returns {string} - The key based on the start of the current ISO week (weeklyGoals_YYYY-MM-DD).
-         */
-        function getWeeklyGoalStorageKey() {
+        // --- Daily To-Do Functions (Global) ---
+        function getDailyKey() {
             const d = new Date();
-            const day = d.getDay(); // Sunday - 0, Monday - 1, ..., Saturday - 6
-            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust for Monday start
-            const startOfWeek = new Date(d.setDate(diff));
-            startOfWeek.setHours(0, 0, 0, 0);
-            startOfWeek.setMilliseconds(0);
-            return `weeklyGoals_${startOfWeek.toISOString().split('T')[0]}`;
+            return `ghibli_daily_${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+        }
+        let dailyTodos = JSON.parse(localStorage.getItem(getDailyKey())) || [];
+        
+        function renderDailyTodos() {
+            const list = document.getElementById('dailyTodoList');
+            list.innerHTML = '';
+            dailyTodos.forEach(todo => {
+                const li = document.createElement('li');
+                li.className = `todo-item !p-3 ${todo.completed ? 'completed' : ''}`;
+                
+                const cb = document.createElement('input');
+                cb.type = 'checkbox'; cb.className = 'todo-checkbox !w-5 !h-5';
+                cb.checked = todo.completed;
+                cb.onchange = (e) => {
+                    todo.completed = e.target.checked;
+                    localStorage.setItem(getDailyKey(), JSON.stringify(dailyTodos));
+                    renderDailyTodos();
+                };
+                
+                const textSpan = document.createElement('span');
+                textSpan.className = 'todo-text !text-sm';
+                textSpan.textContent = todo.text;
+                
+                const delBtn = document.createElement('button');
+                delBtn.innerHTML = '<i class="fas fa-times opacity-50 hover:opacity-100"></i>';
+                delBtn.onclick = () => {
+                    dailyTodos = dailyTodos.filter(t => t.id !== todo.id);
+                    localStorage.setItem(getDailyKey(), JSON.stringify(dailyTodos));
+                    renderDailyTodos();
+                };
+                li.append(cb, textSpan, delBtn);
+                list.appendChild(li);
+            });
+            document.getElementById('dailyDateDisplay').textContent = new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'});
         }
 
-        /**
-         * Loads the weekly goal count from local storage.
-         * Resets the count if it's a new week.
-         * @returns {number} The current completed goal count for the week.
-         */
+        document.getElementById('addDailyTodoButton').onclick = () => {
+            const input = document.getElementById('dailyTodoInput');
+            if(input.value.trim()){
+                dailyTodos.push({ id: Date.now(), text: input.value.trim(), completed: false });
+                localStorage.setItem(getDailyKey(), JSON.stringify(dailyTodos));
+                input.value = '';
+                renderDailyTodos();
+            }
+        };
+
+        // --- Weekly Goal Tracker ---
+        function getWeeklyKey() {
+            const d = new Date();
+            const diff = d.getDate() - d.getDay() + (d.getDay() === 0 ? -6 : 1); 
+            const start = new Date(d.setDate(diff)).toISOString().split('T')[0];
+            return `ghibli_weekly_${start}`;
+        }
         function loadWeeklyGoals() {
-            const weekKey = getWeeklyGoalStorageKey();
-            const lastLoadedWeek = localStorage.getItem('lastWeeklyGoalWeek');
-
-            // If it's a new week, reset the goal count
-            if (lastLoadedWeek !== weekKey) {
-                localStorage.removeItem(lastLoadedWeek); // Clear old week's data
-                localStorage.setItem('lastWeeklyGoalWeek', weekKey); // Update last loaded date
-                return 0; // Start with 0 for the new week
-            }
-
-            const goalsJson = localStorage.getItem(weekKey);
-            return goalsJson ? JSON.parse(goalsJson).count : 0;
+            return parseInt(localStorage.getItem(getWeeklyKey()) || '0');
         }
-
-        /**
-         * Saves the weekly goal count to local storage.
-         * @param {number} count - The current completed goal count.
-         */
-        function saveWeeklyGoals(count) {
-            const weekKey = getWeeklyGoalStorageKey();
-            localStorage.setItem(weekKey, JSON.stringify({ count: count }));
-            localStorage.setItem('lastWeeklyGoalWeek', weekKey); // Keep track of the week saved
-            updateGoalTrackerUI(count); // Re-render after saving
-        }
-
-        /**
-         * Increments the weekly goal count in local storage.
-         */
         function incrementWeeklyGoal() {
-            let currentCount = loadWeeklyGoals();
-            if (currentCount < 3) {
-                currentCount++;
-                saveWeeklyGoals(currentCount);
+            let count = loadWeeklyGoals();
+            if (count < 3) {
+                count++;
+                localStorage.setItem(getWeeklyKey(), count);
+                updateGoalUI(count);
             }
         }
-
-        /**
-         * Updates the UI for the weekly goal tracker.
-         * @param {number} completedCount - The number of goals completed this week.
-         */
-        function updateGoalTrackerUI(completedCount) {
-            goalStatus.textContent = `Progress: ${completedCount}/3`;
-
-            // Update circle colors
-            goalCircle1.classList.toggle('completed', completedCount >= 1);
-            goalCircle2.classList.toggle('completed', completedCount >= 2);
-            goalCircle3.classList.toggle('completed', completedCount >= 3);
-
-            // Show/hide goal met message
-            if (completedCount >= 3) {
-                goalMetMessage.classList.remove('hidden');
-            } else {
-                goalMetMessage.classList.add('hidden');
-            }
+        function updateGoalUI(count) {
+            document.getElementById('goalStatus').textContent = `Progress: ${count}/3`;
+            document.getElementById('goalCircle1').classList.toggle('completed', count >= 1);
+            document.getElementById('goalCircle2').classList.toggle('completed', count >= 2);
+            document.getElementById('goalCircle3').classList.toggle('completed', count >= 3);
+            document.getElementById('goalMetMessage').classList.toggle('hidden', count < 3);
         }
 
-        // --- Monthly Reminder Functions ---
 
-        /**
-         * Calculates and displays the number of days left in the current month.
-         */
-        function calculateDaysLeftInMonth() {
-            const today = new Date();
-            const year = today.getFullYear();
-            const monthName = today.toLocaleString('default', { month: 'long' }); // Get full month name
-
-            // Get the last day of the current month
-            const lastDayOfMonth = new Date(year, today.getMonth() + 1, 0).getDate();
-            const currentDay = today.getDate();
-
-            const daysLeft = lastDayOfMonth - currentDay;
-            daysLeftElement.textContent = `${daysLeft} Days Left in ${monthName}`; // Update text
-        }
-
-        // --- Calendar and Clock Functions ---
-
-        /**
-         * Updates the current date display.
-         */
-        function updateCurrentDate() {
-            const now = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            currentDateDisplay.textContent = now.toLocaleDateString('en-US', options);
-        }
-
-        /**
-         * Updates the digital clocks for Central Time and Philippines Time.
-         */
+        // --- Clocks & Timers ---
         function updateClocks() {
             const now = new Date();
-
-            // Central Time (CT) - Using 'America/Chicago' for CDT/CST
-            const centralTimeOptions = {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: true,
-                timeZone: 'America/Chicago'
-            };
-            centralTimeDisplay.textContent = now.toLocaleTimeString('en-US', centralTimeOptions);
-
-            // Philippines Time (PHT) - UTC+8
-            const philippinesTimeOptions = {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: true,
-                timeZone: 'Asia/Manila'
-            };
-            philippinesTimeDisplay.textContent = now.toLocaleTimeString('en-US', philippinesTimeOptions);
+            document.getElementById('currentDateDisplay').textContent = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('centralTime').textContent = now.toLocaleTimeString('en-US', { timeZone: 'America/Chicago', hour: '2-digit', minute: '2-digit', second:'2-digit' });
+            document.getElementById('philippinesTime').textContent = now.toLocaleTimeString('en-US', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', second:'2-digit' });
         }
 
-        // --- Floating Widgets Toggle Functionality ---
-
-        const WIDGET_COLLAPSED_KEY = 'widgetsCollapsed';
-
-        /**
-         * Toggles the collapsed state of the floating widgets.
-         */
-        function toggleFloatingWidgets() {
-            const isCollapsed = floatingWidgetContainer.classList.toggle('collapsed');
-            localStorage.setItem(WIDGET_COLLAPSED_KEY, isCollapsed);
-            updateToggleButtonIcon(isCollapsed);
+        function calculateDaysLeft() {
+            const today = new Date();
+            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+            document.getElementById('daysLeft').textContent = `${lastDay - today.getDate()} Days Left`;
         }
 
-        /**
-         * Updates the icon of the toggle button based on the collapsed state.
-         * @param {boolean} isCollapsed - True if widgets are collapsed, false otherwise.
-         */
-        function updateToggleButtonIcon(isCollapsed) {
-            const icon = toggleWidgetsButton.querySelector('i');
-            if (isCollapsed) {
-                icon.classList.remove('fa-chevron-up');
-                icon.classList.add('fa-chevron-down');
-            } else {
-                icon.classList.remove('fa-chevron-down');
-                icon.classList.add('fa-chevron-up');
-            }
+        // --- Theme Toggle ---
+        function toggleTheme() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('ghibli_theme', isDark ? 'dark' : 'light');
         }
+        if(localStorage.getItem('ghibli_theme') === 'dark') document.body.classList.add('dark-mode');
 
-        /**
-         * Loads the initial collapsed state from local storage.
-         */
-        function loadFloatingWidgetsState() {
-            const savedState = localStorage.getItem(WIDGET_COLLAPSED_KEY);
-            if (savedState === 'true') {
-                floatingWidgetContainer.classList.add('collapsed');
-                updateToggleButtonIcon(true);
-            } else {
-                floatingWidgetContainer.classList.remove('collapsed');
-                updateToggleButtonIcon(false);
-            }
-        }
-
-        // Event listener for the toggle button
-        toggleWidgetsButton.addEventListener('click', toggleFloatingWidgets);
-
-        // --- YouTube Player Functions ---
-        /**
-         * Extracts YouTube video ID from various YouTube URL formats.
-         * @param {string} url - The YouTube video URL.
-         * @returns {string|null} The video ID or null if not found.
-         */
-        function getYoutubeVideoId(url) {
-            let videoId = null;
-            const youtubeRegex = /(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-            const match = url.match(youtubeRegex);
-            if (match && match[1]) {
-                videoId = match[1];
-            }
-            return videoId;
-        }
-
-        /**
-         * Loads a YouTube video into the iframe based on the provided video link.
-         */
-        function loadYoutubeVideo() {
-            const videoLink = youtubeVideoLinkInput.value.trim();
-            if (videoLink) {
-                const videoId = getYoutubeVideoId(videoLink);
-                if (videoId) {
-                    youtubePlayer.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&si=h5g-r998jU-6_j1b`;
-                } else {
-                    // Provide feedback for invalid URL
-                    alert("Please enter a valid YouTube video link (e.g., youtube.com/watch?v=VIDEO_ID or youtu.be/VIDEO_ID).");
-                }
-            } else {
-                // If input is empty, revert to default or show error
-                alert("Please enter a YouTube video link.");
-            }
-        }
-
-        // Event listeners for YouTube player
-        loadYoutubeVideoButton.addEventListener('click', loadYoutubeVideo);
-        youtubeVideoLinkInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                loadYoutubeVideo();
-            }
-        });
-
-
-        // Initial calls to render data and set up reminders when the window loads
+        // --- Initialization ---
         window.onload = () => {
-            loadThemePreference(); // Load theme preference first
-            renderGeneralTodos(); // Render general todos from local storage
-            renderDailyTodos(); // Render daily todos from local storage
-            updateGoalTrackerUI(loadWeeklyGoals()); // Load and update weekly goals
-            calculateDaysLeftInMonth(); // Calculate and display days left in month
-
-            // Initial display of date and clocks
-            updateCurrentDate();
+            renderTabs();
+            loadActiveProject();
+            renderDailyTodos();
+            updateGoalUI(loadWeeklyGoals());
+            calculateDaysLeft();
             updateClocks();
-
-            // Load initial state of floating widgets
-            loadFloatingWidgetsState();
-
-            // Update clocks every second
             setInterval(updateClocks, 1000);
         };
     </script>
